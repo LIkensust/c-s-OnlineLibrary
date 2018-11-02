@@ -1,0 +1,48 @@
+{"refresh_interval":60,"timeout":12.500000,"dynamic_loading":[{"so_path":"plugins/User.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdUserLogin"},{"cmd":2003,"class":"neb::CmdUserLogout"}],"module":[{"path":"im/user/login","class":"neb::ModuleLogin"},{"path":"im/user/logout","class":"neb::ModuleLogout"}]},{"so_path":"plugins/ChatMsg.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdChat"}],"module":[]}]}
+-------------------------------------------------------------------
+neb::CmdUserLogout
+iValue = 2001
+fTimeout = 12.5
+strValue = im/user/login
+-------------------------------------------------------------------
+{"refresh_interval":60,"timeout":12.500000,"dynamic_loading":[{"so_path":"plugins/User.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdUserLogin"},{"cmd":2003,"class":"neb::CmdUserLogout"}],"module":[{"path":"im/user/login","class":"neb::ModuleLogin"},{"path":"im/user/logout","class":"neb::ModuleLogout"}]},{"so_path":"plugins/ChatMsg.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdChat"}],"module":[]}],"depend":{"nebula":"https://github.com/Bwar/Nebula","bootstrap":["BEACON","LOGIC","LOGGER","INTERFACE","ACCESS"]}}
+-------------------------------------------------------------------
+{
+	"refresh_interval":	60,
+	"timeout":	12.500000,
+	"dynamic_loading":	[{
+			"so_path":	"plugins/User.so",
+			"load":	false,
+			"version":	1,
+			"cmd":	[{
+					"cmd":	2001,
+					"class":	"neb::CmdUserLogin"
+				}, {
+					"cmd":	2003,
+					"class":	"neb::CmdUserLogout"
+				}],
+			"module":	[{
+					"path":	"im/user/login",
+					"class":	"neb::ModuleLogin"
+				}, {
+					"path":	"im/user/logout",
+					"class":	"neb::ModuleLogout"
+				}]
+		}, {
+			"so_path":	"plugins/ChatMsg.so",
+			"load":	false,
+			"version":	1,
+			"cmd":	[{
+					"cmd":	2001,
+					"class":	"neb::CmdChat"
+				}],
+			"module":	[]
+		}],
+	"depend":	{
+		"nebula":	"https://github.com/Bwar/Nebula",
+		"bootstrap":	["BEACON", "LOGIC", "LOGGER", "INTERFACE", "ACCESS"]
+	}
+}
+-------------------------------------------------------------------
+json equal
+{"refresh_interval":60,"timeout":12.500000,"dynamic_loading":[{"so_path":"plugins/User.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdUserLogin"},{"cmd":2003,"class":"neb::CmdUserLogout"}],"module":[{"path":"im/user/login","class":"neb::ModuleLogin"},{"path":"im/user/logout","class":"neb::ModuleLogout"}]},{"so_path":"plugins/ChatMsg.so","load":false,"version":1,"cmd":[{"cmd":2001,"class":"neb::CmdChat"}],"module":[]}],"depend":{"nebula":"https://github.com/Bwar/CJsonObject","bootstrap":["BEACON","LOGGER","INTERFACE","ACCESS"]}}

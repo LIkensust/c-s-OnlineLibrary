@@ -1,0 +1,4 @@
+g++   -O2 -Wall -ggdb -m64 -D_GNU_SOURCE=1 -D_REENTRANT -D__GUNC__  -c -o demo.o demo.cpp  -D_LINUX_OS_ 
+g++   -O2 -Wall -ggdb -m64 -D_GNU_SOURCE=1 -D_REENTRANT -D__GUNC__  -c -o ../CJsonObject.o ../CJsonObject.cpp  -D_LINUX_OS_ 
+gcc   -O2 -Wall -ggdb -m64 -D_GNU_SOURCE=1 -D_REENTRANT -D__GUNC__  -c -o ../cJSON.o ../cJSON.c  -D_LINUX_OS_ 
+g++ -g -o CJsonObjectTest demo.o ../CJsonObject.o ../cJSON.o  -D_LINUX_OS_ 
