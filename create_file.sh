@@ -51,9 +51,13 @@ do
         name=$name$next
         let j++
     done
-    touch $name
-    printf ">creat $name\n"
+#    touch $name
+#   将text.json中的内容复制过来 并替换id为当前文件名id
+    cp ${basepath}"/text.json" $name
     let i++
+    sed -i "s/9787115147318/${name}/g" $name
+    printf ">[${i}/${num}] creat $name \n" 
+
 done
 printf "get out $bookfile\n"
 printf ">down\n"
