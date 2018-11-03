@@ -3,7 +3,9 @@
 #include <pthread.h>
 #include <cassert>
 #include <string>
-
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #define HASHSIZE 1000
 using namespace std;
 //创建一个hash映射 完成文件分类
@@ -50,6 +52,9 @@ string file_hash(const string& filename)
     assert(!(filename.empty()));
     int num_of_dir = _hash_(filename);
     string ret = itoa(num_of_dir);
+    ret = ret+"/";
+    ret = ret + filename;
+    int fd = open(ret.c);
     return ret;
 }
 
