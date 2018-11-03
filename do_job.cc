@@ -8,14 +8,14 @@
 using namespace std;
 //创建一个hash映射 完成文件分类
 
-
+//这里用的hash函数与shell脚本中的hash函数必须保持一致
 int _hash_(const string& filename)
 {
     int ret = 0;
     string::const_iterator it = filename.begin();
     while(it != filename.end())
     {
-        ret = ret*33 + (*it) - '0';
+        ret = ret*2 + (*it) - '0';
         it++;
     }
     return ret % HASHSIZE;
