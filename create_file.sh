@@ -88,7 +88,7 @@ do
 #    touch $name
 #   将text.json中的内容复制过来 并替换id为当前文件名id
     (( hash = hash%HASHSIZE ))
-    printf "${hash}\n"
+#    printf "${hash}\n"
     cp ${basepath}"/text.json" ./"dir"$hash/$name
     let i++
     sed -i "s/9787115147318/${name}/g" ./"dir"$hash/$name
