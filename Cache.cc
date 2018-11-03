@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <map>
 //维护一个缓冲区 
 //功能：打开的文件进行内存映射之后 将指向映射区的指针存放
 //读文件先到缓冲区查找 找不到就读到缓存区
@@ -14,9 +16,48 @@
 //释放了
 //
 //所以按照经典的生产者消费者模型：
-int main()
+using namespace std;
+
+struct Bascinf
 {
-    std::cout << "Hello world" << std::endl;
-    return 0;
+    const void * const _ptr;
+    const size_t _size;
+
+    Bascinf()
+        :_ptr(NULL),
+        _size(0)
+    {}
+};
+
+struct Cacheinf
+{
+    long long _visited;
+    size_t _size;
+    std::string _id;
+    bool _changed;
+    void* _ptr;
+
+    Cacheinf()
+        :_visited(0),
+        _size(0),
+        _changed(false),
+        _ptr(NULL)
+    {}
+};
+
+
+typedef map<string,Cacheinf> Map;
+
+Bascinf getfile(Map& cachemap,string id)
+{
+    Bascinf ret;
+    if(cachemap.find(id) == cachemap.end())
+    {
+        //do open
+        return ret;
+    }
+    return ret;
 }
+
+
 
