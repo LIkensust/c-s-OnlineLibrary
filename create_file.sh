@@ -15,6 +15,14 @@
 #    return ret % HASHSIZE;
 #}
 
+if (( $# == 3 ));then
+    if (( $1 == "-f" ));then
+        rm -rf ./books
+        shift 1
+    fi
+fi
+
+
 filenum=1000
 HASHSIZE=1000
 if (( $# < 1 || $# > 2));then

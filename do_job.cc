@@ -24,7 +24,7 @@ int _hash_(const string& filename)
     return ret % HASHSIZE;
 }
 
-string itoa(int num)
+string _itoa_(int num)
 {
     string ret;
     char tmp[2] = {0};
@@ -45,44 +45,59 @@ string itoa(int num)
 string file_hash(const string& filename)
 {
     //文件名是一个1-19位长度的 不重复的数字
-    //共计200 0000个文件
     //需要投影到HASHSIZE个文件夹中 每个文件夹里边有2000个文件
     //
     //需不需要维护hash表？
     //目前看不需要维护hash表
     assert(!(filename.empty()));
     int num_of_dir = _hash_(filename);
-    string ret = itoa(num_of_dir);
+    string ret = _itoa_(num_of_dir);
     ret = "./books/dir"+ret;
     ret = ret+"/";
     ret = ret + filename;
-    int fd = open(ret.c_str(),O_RDONLY,0644);
-    //cout<<ret<<endl;
-    if(fd <= 0)
-    {
-        printf("opne feld\n");
-    }
-    else
-    {
-        printf("fd:%d,path:%s\n",fd,ret.c_str());
-    }
     return ret;
 }
 
-
-int main()
+bool init_hash()
 {
     FILE* cfg = fopen("./hash_config.cfg","r");
+    if(cfg == NULL)
+    {
+        return false;
+    }
+    fscanf(cfg,"%d",&HASHSIZE);
+    fclose(cfg);
+    return true;
+}
+
+int test()
+{
+    init_hash();
+    string ret;
     FILE* booklist = fopen("./booklist","r");
     char buf[20] = {0};
-    fscanf(cfg,"%d",&HASHSIZE);
     while(!feof(booklist))
     {
-    memset(buf,0,20);
-    fscanf(booklist,"%s\n",buf);
-    string name = buf;
-    file_hash(name);
+        memset(buf,0,20);
+        fscanf(booklist,"%s\n",buf);
+        string name = buf;
+        ret = file_hash(name);
+        int fd = open(ret.c_str(),O_RDONLY,0644);
+        if(fd <= 0)
+        {
+            printf("open fild\n");
+        }
+        else
+        {
+            printf("fd:%d,path:%s\n",fd,ret.c_str());
+        }
+
     }
     return 0;
 }
 
+int main()
+{
+    test();
+    return 0;
+}
