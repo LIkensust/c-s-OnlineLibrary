@@ -6,8 +6,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#define HASHSIZE 1000
 using namespace std;
+int HASHSIZE = 0;
+
 //创建一个hash映射 完成文件分类
 
 //这里用的hash函数与shell脚本中的hash函数必须保持一致
@@ -52,16 +53,36 @@ string file_hash(const string& filename)
     assert(!(filename.empty()));
     int num_of_dir = _hash_(filename);
     string ret = itoa(num_of_dir);
+    ret = "./books/dir"+ret;
     ret = ret+"/";
     ret = ret + filename;
-    int fd = open(ret.c);
+    int fd = open(ret.c_str(),O_RDONLY,0644);
+    //cout<<ret<<endl;
+    if(fd <= 0)
+    {
+        printf("opne feld\n");
+    }
+    else
+    {
+        printf("fd:%d,path:%s\n",fd,ret.c_str());
+    }
     return ret;
 }
 
 
 int main()
 {
-    std::cout << "Hello world" << std::endl;
+    FILE* cfg = fopen("./hash_config.cfg","r");
+    FILE* booklist = fopen("./booklist","r");
+    char buf[20] = {0};
+    fscanf(cfg,"%d",&HASHSIZE);
+    while(!feof(booklist))
+    {
+    memset(buf,0,20);
+    fscanf(booklist,"%s\n",buf);
+    string name = buf;
+    file_hash(name);
+    }
     return 0;
 }
 

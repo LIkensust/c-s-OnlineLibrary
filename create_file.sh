@@ -27,13 +27,22 @@ if (( $# == 2));then
     let HASHSIZE=$2
 fi
 
+#记录hash数量
+rm -f hash_config.cfg
+touch hash_config.cfg
+printf "$HASHSIZE" >> hash_config.cfg
+
+./CreateJson
+
+rm -f ./booklist
+touch booklist
 num=$1
 printf "\n"
 printf "=====================================\n"
 basepath=$(cd `dirname $0`; pwd)
 printf ">get in $basepath\n"
-printf ">input the number of files you want to create\n"
 mkdir books 
+
 
 if (($? != 0)); then
     while : 
@@ -68,6 +77,7 @@ hash=0
 let i=0
 while (( i<num ))
 do
+    hash=0
     size=$RANDOM
     name=""
     (( size=$size%19+1  ))
@@ -89,11 +99,13 @@ do
 #   将text.json中的内容复制过来 并替换id为当前文件名id
     (( hash = hash%HASHSIZE ))
 #    printf "${hash}\n"
-    cp ${basepath}"/text.json" ./"dir"$hash/$name
-    let i++
-    sed -i "s/9787115147318/${name}/g" ./"dir"$hash/$name
-    printf ">[${i}/${num}] creat $name \n" 
-
+    if [ ! -f ./"dir"$hash/$name ] ;then
+        printf "${name}\n" >> ../booklist
+        cp ${basepath}"/text.json" ./"dir"$hash/$name
+        sed -i "s/9787115147318/${name}/g" ./"dir"$hash/$name
+        let i++;
+        printf ">[${i}/${num}] creat $name \n" 
+    fi
 done
 printf "get out $bookfile\n"
 printf ">down\n"
