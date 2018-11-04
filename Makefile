@@ -1,5 +1,10 @@
 .PHONY:all
-all:test bookjson
+all:ser cli test bookjson
+
+ser:server.cc
+	g++ ./server.cc -o ser -lpthread -levent
+cli:client.cc
+	g++ ./client.cc -o cli -lpthread -levent
 
 .PHONY:test
 test:
@@ -17,4 +22,5 @@ clean:
 	rm -f test.out
 	rm -f make_test_json_file.o ./CJsonObject/CJsonObject.o ./CJsonObject./cJSON.o 
 	rm -f CreateJson
-
+	rm -f cli
+	rm -f ser
