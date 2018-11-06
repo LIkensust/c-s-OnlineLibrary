@@ -56,30 +56,15 @@ struct cache_node
 map<string,cache_node> cache;
 typedef map<string,cache_node>::iterator mapit;
 
-struct cmp//实现大堆
+struct cmp
 {
     bool operator()(mapit a,mapit b)
     {
-        time_t now = time(NULL);
-        time_t a_l = now - a->second.lasttime;
-        time_t b_l = now - b->second.lasttime;
-        
-        long long sub = a->second.cont - b->second.cont; 
-        if(abs(sub) > 1000)
-        {
-            return (sub>0)?false:true;
-        }
-        else if(sub > 100)
-        {
-            time_t a_per = a->second.per;
-            time_t b_per = b->second.per;
-            return (a_per>b_per)?true:false;
-        }
-        return (a_l>b_l)?true:false; 
+
     }
 };
 
-priority_queue<mapit,cmp> heap;
+priority_queue<mapit> heap;
 //事件队列
 queue<int> fd_que;
 //创建一个hash映射 完成文件分类
@@ -242,35 +227,13 @@ void free_part_of_map()
         //释放
         pthread_rwlock_wrlock(&map_lock);
         do{
-            cmp tmp;
             if(cache.size() < 200000)//防止重复释放
             {
                 break;
             }
             else
             {
-                mapit it= cache.begin();
-                while(it != cache.end())
-                {
-                    if(heap.size() < 60000)
-                        heap.push_back(it++);
-                    else
-                    {
-                        bool less = tmp(it,heap.front());
-                        if(less)
-                        {
-                            heap.pop();
-                            heap.push_back(it);
-                        }
-                        it++;
-                    }
-                }
-                while(heap.size() !=0 )
-                {
-                    mapit it = heap.front();
-                    cache.erase(it);
-                    heap.pop();
-                }
+                
             }
         }while(0);
         pthread_rwlock_unlock(&map_lock);
@@ -301,9 +264,7 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
         if(flag == true)
         {
             //不在缓存区内
-#ifdef TEST
-        cout<<"不在缓存区"<<endl;
-#endif  
+            cout<<"不在缓存区"<<endl;
             string ret = file_hash(filename);
             int filesize = -1;
             struct stat statbuf;
@@ -363,49 +324,6 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
     }
     else if(msg.type == WRITE)
     {
-        string filename = msg.fileid;
-        pthread_rwlock_rdlock(&map_lock);
-        map<string,cache_node>::iterator it = cache.find(filename);
-        bool flag = (it == cache.end());
-        pthread_rwlock_unlock(&map_lock);
-        if(flag == true)
-        {
-            //不在缓存区
-            string ret = file_hash(filename);
-            struct stat statbuf;
-            if(stat(ret.c_str(),&statbuf) < 0)
-            {
-                //404
-                sprintf(p,"HTTP/1.1 404 NOTFOUND\r\n\r\n");
-                write(fd,p,strlen(p)+1);
-            }
-            else
-            {
-                FILE *fout = fopen(ret.c_str(),"w");
-                if(fout == NULL)
-                {
-                    char tmpbuf[]="HTTP/1.1 503 Server Unavailable\r\n\r\n";
-                    socket_write(fd,tmpbuf,strlen(tmpbuf));
-                    return; 
-                }
-                char *data = msg.body;
-                while(*data != '\0')
-                {
-                    fprintf(fout,"%c",*data++);                  
-                }
-                fclose(fout);
-                char tmpbuf[]="HTTP/1.1 200 OK\r\n\r\n";
-                socket_write(fd,tmpbuf,strlen(tmpbuf));
-                return; 
-            }    
-        }
-        else
-        {
-            pthread_rwlock_wrlock(&map_lock);
-            cache_node tmp = cache[filename];
-            
-            pthread_rwlock_rdlock(&map_lock);
-        }
 
     }
     else
