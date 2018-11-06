@@ -13,7 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <semaphore.h>
 #include <time.h>
-//#define TEST
+#define TEST
 #define EVENTSIZE 300
 #define BUFSIZE 3000
 static int HASHSIZE;
@@ -35,6 +35,13 @@ enum HTTPTYPE
     ERR
 };
 
+struct http_msg
+{
+    string fileid;
+    enum HTTPTYPE type;
+    char *body;
+};
+
 struct cache_node
 {
 //    string id;
@@ -45,6 +52,8 @@ struct cache_node
     char * data;
 };
 map<string,cache_node> cache;
+//事件队列
+queue<int> fd_que;
 //创建一个hash映射 完成文件分类
 
 //这里用的hash函数与shell脚本中的hash函数必须保持一致
@@ -111,13 +120,174 @@ bool init_hash()
     return true;
 }
 
-//事件队列
-queue<int> fd_que;
+
+
+void _read_http(char* buf,struct http_msg* msg)
+{
+    //GET /api/v1/books/<book_id>
+    //PUT
+#ifdef TEST
+    cout<<__FUNCTION__<<endl;
+    cout<<buf<<endl;
+#endif
+    if(strstr(buf,"GET")!=NULL)
+    {
+        msg->type = READ;
+#ifdef TEST
+    cout<<__LINE__<<endl;
+#endif
+    }
+    else if(strstr(buf,"PUT")!=NULL)
+    {
+        msg->type = WRITE;
+#ifdef TEST
+    cout<<__LINE__<<endl;
+#endif
+    }
+    else
+    {
+        msg->type = ERR;
+#ifdef TEST
+    cout<<__LINE__<<endl;
+#endif
+        return;
+    }
+#ifdef TEAT
+    cout<<"type finish"<<endl;
+#endif
+    char *p = strstr(buf,"/books/");
+    p+=7;
+    printf("%s\n",p);
+    while(*p!=' '&&*p!='\r'&&*p!='\n'&&*p!='\0')
+    {
+        msg->fileid+=*p;
+        p++;
+    }
+#ifdef TEST
+    cout<<msg->fileid<<endl;
+#endif
+    if(msg->type == WRITE)
+    {
+        msg->body = strstr(buf,"\r\n\r\n");
+        msg->body += 4;
+    }
+    return;
+}
+
+ssize_t socket_write(int sockfd, const char* buffer, size_t buflen)
+{
+    ssize_t tmp;
+    size_t total = buflen;
+    const char* p = buffer;
+    while(1)
+    {
+        tmp = write(sockfd, p, total);
+        if(tmp < 0)
+        {
+            // 当send收到信号时,可以继续写,但这里返回-1.
+            if(errno == EINTR)
+                return -1;
+            // 当socket是非阻塞时,如返回此错误,表示写缓冲队列已满,
+            // 在这里做延时后再重试.
+            if(errno == EAGAIN)
+            {
+                usleep(1000);
+                continue;
+            }
+            return -1;
+        }
+        if((size_t)tmp == total)
+            return buflen;
+        total -= tmp;
+        p += tmp;
+    }
+    return tmp;//返回已写字节数
+}
+
 
 void main_job(int fd,boost::shared_ptr<char>& buf)
 {
     char *p = buf.get();
-    
+    struct http_msg msg;
+    _read_http(p,&msg);
+#ifdef TEST
+    cout<<"http 解析完毕"<<endl;
+#endif
+    if(msg.type == READ)
+    {
+        memset(p,0,BUFSIZE);
+        string filename = msg.fileid;
+        pthread_rwlock_rdlock(&map_lock);
+        map<string,cache_node>::iterator it = cache.find(filename);
+        bool flag = (it == cache.end());
+        pthread_rwlock_unlock(&map_lock);
+        if(flag == true)
+        {
+            //不在缓存区内
+            cout<<"不在缓存区"<<endl;
+            string ret = file_hash(filename);
+            int filesize = -1;
+            struct stat statbuf;
+            if(stat(ret.c_str(),&statbuf) < 0)
+            {
+                //404
+                sprintf(p,"HTTP/1.1 404 NOTFOUND\r\n\r\n");
+                write(fd,p,strlen(p)+1);
+            }
+            else
+            {
+                filesize = statbuf.st_size;
+                int file_fd = open(ret.c_str(),O_RDONLY,0666);
+#ifdef TEST
+                cout<<"file_fd:"<<file_fd<<endl;
+#endif
+                void *fp = mmap(NULL,(size_t)filesize,PROT_READ,MAP_SHARED,file_fd,(off_t)0);
+                close(file_fd);
+#ifdef TEST
+                cout<<"fp:"<<fp<<endl;
+#endif
+                struct cache_node tmp;
+                tmp.cont = 1;
+                tmp.data = (char *)fp;
+                tmp.size = filesize;
+                tmp.lasttime = time(NULL);
+                tmp.per = 1;
+                //上锁
+                pthread_rwlock_wrlock(&map_lock);
+                cache[filename] = tmp;
+                it = cache.find(filename);
+                pthread_rwlock_unlock(&map_lock);
+                //解锁
+
+            }
+        }
+        else
+        {
+                pthread_rwlock_wrlock(&map_lock);
+                it->second.cont++;
+                time_t tmp = it->second.lasttime;
+                it->second.lasttime = time(NULL);
+                it->second.per = (3*it->second.per + 7*(it->second.lasttime - tmp))/10;  
+                pthread_rwlock_unlock(&map_lock);
+        }
+        //在缓存区内
+        const struct cache_node& node = it->second;
+        sprintf(p,"HTTP/1.1 200 OK\r\nConnection_Type:application/json\r\n\r\n");
+        int len = strlen(p);
+        memcpy(p+strlen(p),node.data,node.size);
+        len+=node.size;
+        int writesize = socket_write(fd,p,len);
+        cout<<"   write:"<<writesize<<endl;
+    }
+    else if(msg.type == WRITE)
+    {
+
+    }
+    else
+    {
+
+    }
+    return ;
 }
 
 
@@ -155,12 +325,12 @@ void pthread_handler(void* arg)
         {
             index += read_size;
         }
-        printf("%s\n",p);
-        if(read_size == -1)
+        if(read_size == -1 && errno != EAGAIN)
         {
             close(fd);
             continue;
         }
+        printf("%s\n",p);
         //开始处理数据
         main_job(fd,buf);
         close(fd);

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "head.h"
+#include <string>
 using namespace std;
 int main(int argc,char *argv[])
 {
@@ -21,13 +22,16 @@ int main(int argc,char *argv[])
     
     int fd = socket(AF_INET,SOCK_STREAM,0);
     connect(fd,(struct sockaddr*)(&sock),sizeof(struct sockaddr_in));
-    char buf[1024]={0};
-    sprintf(buf,"hello world\n");
-    printf("%s\n",buf);
-    write(fd,buf,strlen(buf));
+    char buf[3000]={0};
+    string fileid;
+    cin>>fileid;
+    fileid = "GET /api/v1/books/"+fileid;
+    fileid = fileid + "\r\n\r\n";
+    write(fd,fileid.c_str(),fileid.size());
+    cout<<fileid<<endl;
     //shutdown(fd,SHUT_WR);
-    memset(buf,0,1024);
-    int num = read(fd,buf,1024);
+    memset(buf,0,3000);
+    int num = read(fd,buf,3000);
     cout<<num<<endl;
     printf("%s\n",buf);
     close(fd);
