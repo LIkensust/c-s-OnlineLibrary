@@ -45,7 +45,7 @@ struct http_msg
 
 struct cache_node
 {
-//    string id;
+    //    string id;
     size_t size;
     long long cont;
     time_t lasttime;
@@ -56,6 +56,7 @@ struct cache_node
 map<string,cache_node> cache;
 typedef map<string,cache_node>::iterator mapit;
 
+template<class T>
 struct cmp//实现大堆
 {
     bool operator()(mapit a,mapit b)
@@ -63,7 +64,7 @@ struct cmp//实现大堆
         time_t now = time(NULL);
         time_t a_l = now - a->second.lasttime;
         time_t b_l = now - b->second.lasttime;
-        
+
         long long sub = a->second.cont - b->second.cont; 
         if(abs(sub) > 1000)
         {
@@ -79,7 +80,7 @@ struct cmp//实现大堆
     }
 };
 
-priority_queue<mapit,cmp> heap;
+priority_queue<mapit,cmp<mapit> > heap;
 //事件队列
 queue<int> fd_que;
 //创建一个hash映射 完成文件分类
@@ -162,21 +163,21 @@ void _read_http(char* buf,struct http_msg* msg)
     {
         msg->type = READ;
 #ifdef TEST
-    cout<<__LINE__<<endl;
+        cout<<__LINE__<<endl;
 #endif
     }
     else if(strstr(buf,"PUT")!=NULL)
     {
         msg->type = WRITE;
 #ifdef TEST
-    cout<<__LINE__<<endl;
+        cout<<__LINE__<<endl;
 #endif
     }
     else
     {
         msg->type = ERR;
 #ifdef TEST
-    cout<<__LINE__<<endl;
+        cout<<__LINE__<<endl;
 #endif
         return;
     }
@@ -302,7 +303,7 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
         {
             //不在缓存区内
 #ifdef TEST
-        cout<<"不在缓存区"<<endl;
+            cout<<"不在缓存区"<<endl;
 #endif  
             string ret = file_hash(filename);
             int filesize = -1;
@@ -341,12 +342,12 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
         }
         else
         {
-                pthread_rwlock_wrlock(&map_lock);
-                it->second.cont++;
-                time_t tmp = it->second.lasttime;
-                it->second.lasttime = time(NULL);
-                it->second.per = (3*it->second.per + 7*(it->second.lasttime - tmp))/10;  
-                pthread_rwlock_unlock(&map_lock);
+            pthread_rwlock_wrlock(&map_lock);
+            it->second.cont++;
+            time_t tmp = it->second.lasttime;
+            it->second.lasttime = time(NULL);
+            it->second.per = (3*it->second.per + 7*(it->second.lasttime - tmp))/10;  
+            pthread_rwlock_unlock(&map_lock);
         }
         //在缓存区内
         pthread_rwlock_rdlock(&map_lock);
@@ -402,15 +403,48 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
         else
         {
             pthread_rwlock_wrlock(&map_lock);
-            cache_node tmp = cache[filename];
-            
+            cache_node &tmp = cache[filename];
+            munmap((void*)tmp.data,tmp.size);
+            string ret = file_hash(filename);
+            struct stat statbuf;
+            if(stat(ret.c_str(),&statbuf) < 0)
+            {
+                //404
+                sprintf(p,"HTTP/1.1 404 NOTFOUND\r\n\r\n");
+                write(fd,p,strlen(p)+1);
+            }
+            else
+            {
+                FILE *fout = fopen(ret.c_str(),"w");
+                if(fout == NULL)
+                {
+                    char tmpbuf[]="HTTP/1.1 503 Server Unavailable\r\n\r\n";
+                    socket_write(fd,tmpbuf,strlen(tmpbuf));
+                    return; 
+                }
+                char *data = msg.body;
+                while(*data != '\0')
+                {
+                    fprintf(fout,"%c",*data++);                  
+                }
+                fclose(fout);
+                char tmpbuf[]="HTTP/1.1 200 OK\r\n\r\n";
+                socket_write(fd,tmpbuf,strlen(tmpbuf));
+                struct stat stbuf;
+                stat(ret.c_str(),&stbuf);
+                int tmpfd = open(ret.c_str(),O_RDONLY,0644);
+                tmp.data = (char*)mmap(NULL,stbuf.st_size,PROT_READ,MAP_SHARED,tmpfd,(off_t)0);
+                tmp.size = stbuf.st_size;
+            }       
             pthread_rwlock_rdlock(&map_lock);
         }
 
     }
     else
     {
-
+        char tmpbuf[]="HTTP/1.1 400 Bad Request\r\n\r\n";
+        socket_write(fd,tmpbuf,strlen(tmpbuf));
+        return; 
     }
     return ;
 }
@@ -433,12 +467,12 @@ void pthread_handler(void* arg)
         fd_que.pop();
         pthread_mutex_unlock(&queue_lock);
         sem_post(&sem_capacity);
-        
+
         //开始读取数据
 #ifdef TEST
         cout<<"read begin by"<<pthread_id<<endl;
 #endif
-        
+
         boost::shared_ptr<char> buf(new char[BUFSIZE]);
         int index = 0;
         int read_size = 0;
@@ -461,7 +495,7 @@ void pthread_handler(void* arg)
         close(fd);
     }   
 }
-    
+
 void Do_Connect(void* arg)
 {
     int socket = (int)(long)(arg);
@@ -535,14 +569,14 @@ void Do_read_wirte(int fd)
 
 void usage()
 {
-   fprintf(stderr,"./ser port\n"); 
+    fprintf(stderr,"./ser port\n"); 
 }
 
 
 int main(int argc,char* argv[])
 {
-//to do 注册退出信号
-    
+    //to do 注册退出信号
+
     if(argc != 2)
     {
         usage();
@@ -591,14 +625,14 @@ int main(int argc,char* argv[])
         perror("listen");
         return -1;
     }
-    
+
     ep_fd = epoll_create(10);   
     struct epoll_event event;
     event.data.fd = listen_sock;
     event.events = EPOLLIN;
     epoll_ctl(ep_fd,EPOLL_CTL_ADD,listen_sock,&event);
     struct epoll_event* event_buf = new epoll_event[EVENTSIZE];
- 
+
     //先创建几个线程:
     int cpu_num = sysconf(_SC_NPROCESSORS_ONLN)*2;
     pthread_t *pthread_id = new pthread_t[cpu_num];
@@ -649,7 +683,7 @@ int main(int argc,char* argv[])
             }
         }
     }//while(1)
- 
+
 
     delete []event_buf;
     delete []pthread_id;
