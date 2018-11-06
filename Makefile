@@ -1,14 +1,10 @@
 .PHONY:all
-all:ser cli test bookjson
+all:ser cli bookjson
 
-ser:server.cc
-	g++ ./server.cc -o ser -lpthread -levent
-cli:client.cc
-	g++ ./client.cc -o cli -lpthread -levent
-
-.PHONY:test
-test:
-	g++ do_job.cc -o test.out
+ser:ser_epoll_pthread.cc
+	g++ ser_epoll_pthread.cc -o ser -lpthread 
+cli:new_cli.cc
+	g++ new_cli.cc -o cli -lpthread 
 
 .PHONY:bookjson
 bookjson:
