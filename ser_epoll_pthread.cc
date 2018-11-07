@@ -10,11 +10,10 @@
 #include <sys/sem.h>
 #include <queue>
 #include <memory>
-#include <boost/shared_ptr.hpp>
 #include <semaphore.h>
 #include "./CJsonObject/CJsonObject.hpp"
 #include <time.h>
-#define TEST
+//#define TEST
 #define EVENTSIZE 300
 #define BUFSIZE 3000
 using namespace std;
@@ -322,7 +321,7 @@ void free_part_of_map()
 }
 
 //主要的业务逻辑在这个函数内
-void main_job(int fd,boost::shared_ptr<char>& buf)
+void main_job(int fd,shared_ptr<char>& buf)
 {
     char *p = buf.get();
     struct http_msg msg;
@@ -522,7 +521,7 @@ void pthread_handler(void* arg)
         cout<<"read begin by"<<pthread_id<<endl;
 #endif
 
-        boost::shared_ptr<char> buf(new char[BUFSIZE]);
+        shared_ptr<char> buf(new char[BUFSIZE]);
         int index = 0;
         int read_size = 0;
         char *p = buf.get();
@@ -532,6 +531,11 @@ void pthread_handler(void* arg)
         while( (read_size=read(fd,p+index,BUFSIZE-1)) > 0 )
         {
             index += read_size;
+        }
+        if(read_size == 0)
+        {
+            close(fd);
+            continue;
         }
         if(read_size == -1 && errno != EAGAIN)
         {

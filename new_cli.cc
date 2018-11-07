@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
-#define TEST
+//#define TEST
 #define DATASIZE 5000
 using namespace std;
 
