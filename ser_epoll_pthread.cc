@@ -56,7 +56,6 @@ struct cache_node
 map<string,cache_node> cache;
 typedef map<string,cache_node>::iterator mapit;
 
-template<class T>
 struct cmp//实现大堆
 {
     bool operator()(mapit a,mapit b)
@@ -80,7 +79,7 @@ struct cmp//实现大堆
     }
 };
 
-priority_queue<mapit,cmp<mapit> > heap;
+priority_queue<mapit,vector<mapit>,cmp > heap;
 //事件队列
 queue<int> fd_que;
 //创建一个hash映射 完成文件分类
@@ -220,7 +219,7 @@ ssize_t socket_write(int sockfd, const char* buffer, size_t buflen)
             // 在这里做延时后再重试.
             if(errno == EAGAIN)
             {
-                usleep(1000);
+                usleep(500);
                 continue;
             }
             return -1;
@@ -254,21 +253,21 @@ void free_part_of_map()
                 while(it != cache.end())
                 {
                     if(heap.size() < 60000)
-                        heap.push_back(it++);
+                        heap.push(it++);
                     else
                     {
-                        bool less = tmp(it,heap.front());
+                        bool less = tmp(it,heap.top());
                         if(less)
                         {
                             heap.pop();
-                            heap.push_back(it);
+                            heap.push(it);
                         }
                         it++;
                     }
                 }
                 while(heap.size() !=0 )
                 {
-                    mapit it = heap.front();
+                    mapit it = heap.top();
                     cache.erase(it);
                     heap.pop();
                 }
@@ -402,6 +401,7 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
         }
         else
         {
+            //在缓存区内
             pthread_rwlock_wrlock(&map_lock);
             cache_node &tmp = cache[filename];
             munmap((void*)tmp.data,tmp.size);
@@ -435,6 +435,7 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
                 int tmpfd = open(ret.c_str(),O_RDONLY,0644);
                 tmp.data = (char*)mmap(NULL,stbuf.st_size,PROT_READ,MAP_SHARED,tmpfd,(off_t)0);
                 tmp.size = stbuf.st_size;
+                close(tmpfd);
             }       
             pthread_rwlock_rdlock(&map_lock);
         }
