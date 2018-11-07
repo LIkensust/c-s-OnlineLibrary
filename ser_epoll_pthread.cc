@@ -156,8 +156,22 @@ bool init_hash()
     return true;
 }
 
+HTTPTYPE _read_head(const char *buf)
+{
+    if(buf[0]=='G' && buf[1] == 'E' && buf[2] == 'T' )
+    {
+        return READ;
+    }
+
+    if(buf[0]=='P' && buf[1] == 'U' && buf[2] == 'T' )
+    {
+        return WRITE;
+    }
+
+    return ERR;
+}
 //http的解析
-void _read_http(char* buf,struct http_msg* msg)
+void _read_http(const char* buf,struct http_msg* msg)
 {
     //GET /api/v1/books/<book_id>
     //PUT
@@ -165,14 +179,24 @@ void _read_http(char* buf,struct http_msg* msg)
     cout<<__FUNCTION__<<endl;
     cout<<buf<<endl;
 #endif
-    if(strstr(buf,"GET")!=NULL)
+
+    //提取第一行
+    const char *line = buf;
+    while(*line != '\r')
+    {
+        line++;
+    }
+    char firstline[100] = {0};
+    memcpy(firstline,buf,sizeof(char)*(line-buf));
+    HTTPTYPE headtype = _read_head(firstline);
+    if(headtype == READ)
     {
         msg->type = READ;
 #ifdef TEST
         cout<<__LINE__<<endl;
 #endif
     }
-    else if(strstr(buf,"PUT")!=NULL)
+    else if(headtype == WRITE)
     {
         msg->type = WRITE;
 #ifdef TEST
@@ -190,7 +214,7 @@ void _read_http(char* buf,struct http_msg* msg)
 #ifdef TEAT
     cout<<"type finish"<<endl;
 #endif
-    char *p = strstr(buf,"/books/");
+    char *p = strstr(firstline,"/books/");
     p+=7;
     printf("%s\n",p);
     while(*p!=' '&&*p!='\r'&&*p!='\n'&&*p!='\0')
@@ -203,7 +227,7 @@ void _read_http(char* buf,struct http_msg* msg)
 #endif
     if(msg->type == WRITE)
     {
-        msg->body = strstr(buf,"\r\n\r\n");
+        msg->body = strstr(const_cast<char*>(line),"\r\n\r\n");
         msg->body += 4;
     }
     return;
