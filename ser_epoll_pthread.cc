@@ -12,21 +12,25 @@
 #include <memory>
 #include <boost/shared_ptr.hpp>
 #include <semaphore.h>
+#include "./CJsonObject/CJsonObject.hpp"
 #include <time.h>
 #define TEST
 #define EVENTSIZE 300
 #define BUFSIZE 3000
-static int HASHSIZE;
 using namespace std;
+
+//哈希表的大小 在寻找文件路径的时候使用
+static int HASHSIZE;
+
 typedef  void *(*FUNPTR)(void*);
-union semun
-{
-    int val;
-};
+//信号量
 sem_t sem_product;
 sem_t sem_capacity;
+//监听套接字
 int ep_fd;
+//对事件队列的锁
 pthread_mutex_t queue_lock;
+//缓存的锁
 pthread_rwlock_t map_lock;
 
 enum HTTPTYPE
@@ -43,6 +47,7 @@ struct http_msg
     char *body;
 };
 
+//使用map进行缓存
 struct cache_node
 {
     //    string id;
@@ -53,9 +58,11 @@ struct cache_node
     char * data;
 };
 
+//缓存区
 map<string,cache_node> cache;
 typedef map<string,cache_node>::iterator mapit;
 
+//使用优先级队列实现堆   这个堆用在对缓存区的清理时
 struct cmp//实现大堆
 {
     bool operator()(mapit a,mapit b)
@@ -120,7 +127,7 @@ string _itoa_(int num)
 #endif
     return ret;
 }
-
+//通过url里的文件id获取文件的实际存储路径
 string file_hash(const string& filename)
 {
     assert(!(filename.empty()));
@@ -136,6 +143,7 @@ string file_hash(const string& filename)
     return ret;
 }
 
+//程序开始运行就因该调用这个函数 读取配置文件中的信息 因为hash长度是根据实际情况改变的
 bool init_hash()
 {
     FILE* cfg = fopen("./hash_config.cfg","r");
@@ -148,8 +156,7 @@ bool init_hash()
     return true;
 }
 
-
-
+//http的解析
 void _read_http(char* buf,struct http_msg* msg)
 {
     //GET /api/v1/books/<book_id>
@@ -202,6 +209,7 @@ void _read_http(char* buf,struct http_msg* msg)
     return;
 }
 
+//对socket wirte的一层封装 因为将socket设置成非阻塞了 保证信息全部写完
 ssize_t socket_write(int sockfd, const char* buffer, size_t buflen)
 {
     ssize_t tmp;
@@ -232,6 +240,14 @@ ssize_t socket_write(int sockfd, const char* buffer, size_t buflen)
     return tmp;//返回已写字节数
 }
 
+//缓存的数据不是不变的 我们并不知道哪些热门数据 在缓存区快要满的时候
+//对缓存区内的数据进行检查 找出冷数据 从缓存区内剔除   程序不断地运行
+//这样就可以动态的筛选出当前的热数据  
+//根据要求 共有200000个热数据  所以将缓存区大小设置成200000
+//每次都剔除30%的数据 
+//假设每秒有2000的访问量 其中的20%访问的是冷数据 等于每秒访问400个冷数据
+//也就是大约200000/400=500s才会重新填满缓存区 等于每10分钟进行一次缓存区释放
+//缓存区命中热数据的概率是80%  
 void free_part_of_map()
 {
     pthread_rwlock_rdlock(&map_lock);
@@ -243,7 +259,7 @@ void free_part_of_map()
         pthread_rwlock_wrlock(&map_lock);
         do{
             cmp tmp;
-            if(cache.size() < 200000)//防止重复释放
+            if(cache.size() < 200000)//防止重复释放 因为在进行下一步之前可能别的线程已经释放过一次
             {
                 break;
             }
@@ -281,6 +297,7 @@ void free_part_of_map()
     }
 }
 
+//主要的业务逻辑在这个函数内
 void main_job(int fd,boost::shared_ptr<char>& buf)
 {
     char *p = buf.get();
@@ -457,7 +474,7 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
     return ;
 }
 
-
+//线程池内的线程执行的函数  使用生产者消费者模型
 void pthread_handler(void* arg)
 {
     cout<<"great success"<<endl;
