@@ -434,10 +434,17 @@ void main_job(int fd,boost::shared_ptr<char>& buf)
                 stat(ret.c_str(),&stbuf);
                 int tmpfd = open(ret.c_str(),O_RDONLY,0644);
                 tmp.data = (char*)mmap(NULL,stbuf.st_size,PROT_READ,MAP_SHARED,tmpfd,(off_t)0);
+#ifdef TEST
+                cout<<"new mmap:";
+                printf("%s\n",tmp.data);
+#endif
                 tmp.size = stbuf.st_size;
                 close(tmpfd);
             }       
-            pthread_rwlock_rdlock(&map_lock);
+            pthread_rwlock_unlock(&map_lock);
+#ifdef TEST
+            cout<<"替换完成"<<endl;
+#endif
         }
 
     }
