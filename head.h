@@ -5,7 +5,6 @@
 #include <string>
 
 #include <arpa/inet.h>
-#include <event.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <sys/epoll.h>
