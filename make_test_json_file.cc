@@ -1,14 +1,4 @@
-#include <iostream>
-#include "./CJsonObject/CJsonObject.hpp"
-#include <string>
-#include <cstdio>
-#include <cstdlib>
-#include <unistd.h>
-#include <cstring>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <string>
+#include "include/common/common.h"
 using namespace std;
 int main ()
 {

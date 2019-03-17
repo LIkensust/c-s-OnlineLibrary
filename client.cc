@@ -1,9 +1,6 @@
-#include "head.h"
+#include "include/common/common.h"
+#include "include/database/mysql_operation.h"
 #include <string>
-#include "./CJsonObject/CJsonObject.hpp"
-#include <string>
-#include <cstdio>
-#include <cstdlib>
 //#define TEST
 #define DATASIZE 5000
 using namespace std;
@@ -349,6 +346,10 @@ void do_write(int fd)
 
 int main(int argc,char *argv[])
 {
+    //MYSQL mysql;
+    //mysql_init(&mysql);
+    //cout<<do_connect(mysql)<<endl;;
+
     //showbook(testbuf);
     if(argc != 3)
     {
