@@ -255,6 +255,7 @@ ssize_t socket_write(int sockfd, const char* buffer, size_t buflen)
       }
       return -1;
     }
+
     if((size_t)tmp == buflen)
       return buflen;
     total -= tmp;
