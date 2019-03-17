@@ -1,9 +1,4 @@
-#include "head.h"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <cassert>
-#include <string>
+#include "include/common/common.h"
 #include <map>
 #include <sys/mman.h>
 #include <pthread.h>
@@ -11,7 +6,6 @@
 #include <queue>
 #include <memory>
 #include <semaphore.h>
-#include "./CJsonObject/CJsonObject.hpp"
 #include <time.h>
 //#define TEST
 #define EVENTSIZE 300
