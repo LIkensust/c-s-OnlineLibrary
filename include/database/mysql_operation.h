@@ -3,7 +3,7 @@
 
 class MysqlTool {
 public:
-  std::unique_ptr<MysqlTool> make() {
+  static std::unique_ptr<MysqlTool> make() {
     return std::unique_ptr<MysqlTool>(new MysqlTool);
   }
 
@@ -31,6 +31,7 @@ public:
                                    db.c_str(),port,NULL,unix_sock);
     if(sql_sock_ == NULL)
       return false;
+    is_connected_ = true;
     return true;
   }
 
@@ -62,14 +63,20 @@ public:
     return NULL;
   }
 
+  bool is_connected() {
+    return is_connected_;
+  }
+
 private:
   MysqlTool()
-    :sql_sock_(NULL),
+    :is_connected_(false),
+    sql_sock_(NULL),
     result_(NULL)
   {
     mysql_init(&mysql_);
   }
 
+  bool is_connected_;
   MYSQL mysql_;
   MYSQL *sql_sock_;
   MYSQL_RES *result_;
