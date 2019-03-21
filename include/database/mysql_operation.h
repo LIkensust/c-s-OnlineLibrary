@@ -27,7 +27,6 @@ public:
     oJson.Get("db",db);
     oJson.Get("port",port);
     oJson.Get("unix_socket",unix_sock);
-
     sql_sock_ = mysql_real_connect(&mysql_,host.c_str(),user.c_str(),passwd.c_str(),
                                    db.c_str(),port,NULL,unix_sock);
     if(sql_sock_ == NULL)
@@ -45,8 +44,24 @@ public:
   }
 
   bool interactive(std::string code) {
-     
+    int ret = mysql_query(sql_sock_,code.c_str());     
+    if(ret == 0) {
+      if(result_ != NULL) {
+        mysql_free_result(result_);
+      }
+      result_ = mysql_store_result(&mysql_);
+      return true;
+    }
+    return false;
   }
+
+  MYSQL_ROW get_slution_by_row() {
+    MYSQL_ROW row;
+    if((row = mysql_fetch_row(result_)) != NULL)
+      return row;
+    return NULL;
+  }
+
 private:
   MysqlTool()
     :sql_sock_(NULL),
