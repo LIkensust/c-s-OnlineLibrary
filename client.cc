@@ -1,5 +1,6 @@
 #include "include/common/common.h"
 #include "include/database/mysql_operation.h"
+#include "include/database/redis_operation.h"
 #include <string>
 //#define TEST
 #define DATASIZE 5000
@@ -346,20 +347,30 @@ void do_write(int fd)
 
 int main(int argc,char *argv[])
 {
-  auto mysqltool = MysqlTool::make(); 
-  mysqltool->do_connect("./config/mysql_cnf.js");
-  if(mysqltool->is_connected()) {
-    mysqltool->interactive("select * from book_inf");
-    MYSQL_ROW row ;
-    while((row = mysqltool->get_slution_by_row()) !=NULL) {
-      cout<<row[0]<<endl;
-      cout<<row[1]<<endl;
-      cout<<row[2]<<endl;
-    }
+ auto mysqltool = MysqlTool::make(); 
+ mysqltool->do_connect("./config/mysql_cnf.js");
+ if(mysqltool->is_connected()) {
+   mysqltool->interactive("select * from book_inf");
+   MYSQL_ROW row ;
+   while((row = mysqltool->get_slution_by_row()) !=NULL) {
+     cout<<row[0]<<endl;
+     cout<<row[1]<<endl;
+     cout<<row[2]<<endl;
+   }
+ } else {
+   cout<<"connect fail"<<endl;
+   return 0;
+ }
+  auto redistool = RedisTool::make(); 
+  if(redistool->do_connect("./config/redis_cnf.js")) {
+    cout<<"connect success"<<endl;
   } else {
-    cout<<"connect fail"<<endl;
-    return 0;
+    cout<<"can't connect"<<endl;
   }
+  redistool->interaction("get test",REDIS_REPLY_STRING);
+  string ret;
+  redistool->get_slution(ret,REDIS_REPLY_STRING);
+  cout<<ret<<endl;
   if(argc != 3)
   {
     usage();

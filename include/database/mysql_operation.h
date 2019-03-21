@@ -45,6 +45,9 @@ public:
   }
 
   bool interactive(std::string code) {
+    if(is_connected_ == false) {
+      return false;
+    }
     int ret = mysql_query(sql_sock_,code.c_str());     
     if(ret == 0) {
       if(result_ != NULL) {

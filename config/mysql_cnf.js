@@ -3,6 +3,6 @@
   "user":"liyuan",
   "passwd":"liyuan",
   "db":"books",
-  "port":"3306",
+  "port":3306,
   "unix_socket":0
 }
