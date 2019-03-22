@@ -494,10 +494,7 @@ void main_job(int fd,shared_ptr<char>& buf)
 //线程池内的线程执行的函数  使用生产者消费者模型
 void pthread_handler(void* arg)
 {
-  cout<<"great success"<<endl;
-  //连接事件
-  //接受数据
-  //写数据
+  cout<<"start success"<<endl;
 #ifdef TEST
   int pthread_id = (int)(long)arg;
 #endif

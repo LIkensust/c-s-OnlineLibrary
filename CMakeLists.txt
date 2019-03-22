@@ -7,7 +7,7 @@ set (VERSION_MINOR 0)
 #add_subdirectory(include)
 add_subdirectory(CJsonObject)
 add_subdirectory(deam)
-add_executable(ser service.cc)
+add_executable(ser server.cc)
 add_executable(cli client.cc)
 add_executable(CreateJson make_test_json_file.cc)
 

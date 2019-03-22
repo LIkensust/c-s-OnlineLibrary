@@ -242,32 +242,32 @@ make_test_json_file.cc.s:
 	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.s
 .PHONY : make_test_json_file.cc.s
 
-service.o: service.cc.o
+server.o: server.cc.o
 
-.PHONY : service.o
+.PHONY : server.o
 
 # target to build an object file
-service.cc.o:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/service.cc.o
-.PHONY : service.cc.o
+server.cc.o:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.o
+.PHONY : server.cc.o
 
-service.i: service.cc.i
+server.i: server.cc.i
 
-.PHONY : service.i
+.PHONY : server.i
 
 # target to preprocess a source file
-service.cc.i:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/service.cc.i
-.PHONY : service.cc.i
+server.cc.i:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.i
+.PHONY : server.cc.i
 
-service.s: service.cc.s
+server.s: server.cc.s
 
-.PHONY : service.s
+.PHONY : server.s
 
 # target to generate assembly for a file
-service.cc.s:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/service.cc.s
-.PHONY : service.cc.s
+server.cc.s:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.s
+.PHONY : server.cc.s
 
 # Help Target
 help:
@@ -289,9 +289,9 @@ help:
 	@echo "... make_test_json_file.o"
 	@echo "... make_test_json_file.i"
 	@echo "... make_test_json_file.s"
-	@echo "... service.o"
-	@echo "... service.i"
-	@echo "... service.s"
+	@echo "... server.o"
+	@echo "... server.i"
+	@echo "... server.s"
 .PHONY : help
 
 
