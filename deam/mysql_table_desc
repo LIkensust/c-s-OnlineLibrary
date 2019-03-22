@@ -1,0 +1,14 @@
+create table bookinf(
+book_id int primary key not null auto_increment,
+book_name varchar(30) not null,
+book_author varchar(30) not null,
+book_inf varchar(1000) not null,
+book_label_id_1 int,
+book_label_id_2 int,
+book_label_id_3 int,
+constraint book_label_id_1 foreign key(book_label_id_1) references label(label_id) on delete restrict ON UPDATE CASCADE,
+constraint book_label_id_2 foreign key(book_label_id_2) references label(label_id) on delete restrict ON UPDATE CASCADE,
+constraint book_label_id_3 foreign key(book_label_id_3) references label(label_id) on delete restrict ON UPDATE CASCADE
+);
+
+alter table bookinf change book_name book_name varchar(30) character utf8 not null;

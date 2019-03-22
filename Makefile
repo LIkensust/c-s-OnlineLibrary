@@ -69,8 +69,8 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named CreateJson
+
+# Build rule for target.
+CreateJson: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 CreateJson
+.PHONY : CreateJson
+
+# fast build rule for target.
+CreateJson/fast:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/build
+.PHONY : CreateJson/fast
+
+#=============================================================================
 # Target rules for targets named ser
 
 # Build rule for target.
@@ -149,6 +162,32 @@ CJsonTool/fast:
 	$(MAKE) -f CJsonObject/CMakeFiles/CJsonTool.dir/build.make CJsonObject/CMakeFiles/CJsonTool.dir/build
 .PHONY : CJsonTool/fast
 
+#=============================================================================
+# Target rules for targets named deam
+
+# Build rule for target.
+deam: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 deam
+.PHONY : deam
+
+# fast build rule for target.
+deam/fast:
+	$(MAKE) -f deam/CMakeFiles/deam.dir/build.make deam/CMakeFiles/deam.dir/build
+.PHONY : deam/fast
+
+#=============================================================================
+# Target rules for targets named deam1
+
+# Build rule for target.
+deam1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 deam1
+.PHONY : deam1
+
+# fast build rule for target.
+deam1/fast:
+	$(MAKE) -f deam/CMakeFiles/deam1.dir/build.make deam/CMakeFiles/deam1.dir/build
+.PHONY : deam1/fast
+
 client.o: client.cc.o
 
 .PHONY : client.o
@@ -175,6 +214,33 @@ client.s: client.cc.s
 client.cc.s:
 	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/client.cc.s
 .PHONY : client.cc.s
+
+make_test_json_file.o: make_test_json_file.cc.o
+
+.PHONY : make_test_json_file.o
+
+# target to build an object file
+make_test_json_file.cc.o:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.o
+.PHONY : make_test_json_file.cc.o
+
+make_test_json_file.i: make_test_json_file.cc.i
+
+.PHONY : make_test_json_file.i
+
+# target to preprocess a source file
+make_test_json_file.cc.i:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.i
+.PHONY : make_test_json_file.cc.i
+
+make_test_json_file.s: make_test_json_file.cc.s
+
+.PHONY : make_test_json_file.s
+
+# target to generate assembly for a file
+make_test_json_file.cc.s:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.s
+.PHONY : make_test_json_file.cc.s
 
 service.o: service.cc.o
 
@@ -211,12 +277,18 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... CreateJson"
 	@echo "... ser"
 	@echo "... cli"
 	@echo "... CJsonTool"
+	@echo "... deam"
+	@echo "... deam1"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
+	@echo "... make_test_json_file.o"
+	@echo "... make_test_json_file.i"
+	@echo "... make_test_json_file.s"
 	@echo "... service.o"
 	@echo "... service.i"
 	@echo "... service.s"
