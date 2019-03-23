@@ -1,11 +1,12 @@
-#include "../include/database/mysql_operation.h"
+#include "../src/include/database/mysql_operation.h"
 #include <iostream>
 using namespace std;
 int main() {
   auto tool = MysqlTool::make();
   tool->do_connect("../config/mysql_cnf.js");
   tool->interactive("delete from bookinf");
-  tool->interactive("insert into bookinf values(1,'The C Programming Language','Dennis Ritchie','The C Program\
+  tool->interactive(
+      "insert into bookinf values(1,'The C Programming Language','Dennis Ritchie','The C Program\
 ming Language译作《C程序设计语言》，是\
 由著名的计算机科学家Brian W. Kernighan\
 和C语言之父的Dennis M. Ritchie合著的一\
@@ -19,14 +20,16 @@ ming Language译作《C程序设计语言》，是\
 例开始讲解程序设计，也已经成为程序设计语言\
 图书的传统。',3,NULL,NULL)");
   int a = tool->interactive("select * from bookinf");
-  if(a == false) {
-    cout<<"err"<<endl;
+  if (a == false) {
+    cout << "err" << endl;
     return 0;
   }
   tool.get_deleter();
   auto row = tool->get_slution_by_row();
-  while(row != NULL) {
-    cout<<row[0]<<" "<<row[1]<<" "<<row[2]<<endl<<row[3]<<endl<<row[4];
+  while (row != NULL) {
+    cout << row[0] << " " << row[1] << " " << row[2] << endl
+         << row[3] << endl
+         << row[4];
     row = tool->get_slution_by_row();
   }
 }

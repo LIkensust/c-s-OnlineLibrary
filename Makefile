@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/liyuan/study/c-s_base_on_libevent
+CMAKE_SOURCE_DIR = /home/liyuan/study/c-s_base_OnlineLibrary
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/liyuan/study/c-s_base_on_libevent
+CMAKE_BINARY_DIR = /home/liyuan/study/c-s_base_OnlineLibrary
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/liyuan/study/c-s_base_on_libevent/CMakeFiles /home/liyuan/study/c-s_base_on_libevent/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/liyuan/study/c-s_base_OnlineLibrary/CMakeFiles /home/liyuan/study/c-s_base_OnlineLibrary/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/liyuan/study/c-s_base_on_libevent/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/liyuan/study/c-s_base_OnlineLibrary/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -163,111 +163,111 @@ CJsonTool/fast:
 .PHONY : CJsonTool/fast
 
 #=============================================================================
-# Target rules for targets named deam
+# Target rules for targets named demo
 
 # Build rule for target.
-deam: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 deam
-.PHONY : deam
+demo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 demo
+.PHONY : demo
 
 # fast build rule for target.
-deam/fast:
-	$(MAKE) -f deam/CMakeFiles/deam.dir/build.make deam/CMakeFiles/deam.dir/build
-.PHONY : deam/fast
+demo/fast:
+	$(MAKE) -f demo/CMakeFiles/demo.dir/build.make demo/CMakeFiles/demo.dir/build
+.PHONY : demo/fast
 
 #=============================================================================
-# Target rules for targets named deam1
+# Target rules for targets named demo1
 
 # Build rule for target.
-deam1: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 deam1
-.PHONY : deam1
+demo1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 demo1
+.PHONY : demo1
 
 # fast build rule for target.
-deam1/fast:
-	$(MAKE) -f deam/CMakeFiles/deam1.dir/build.make deam/CMakeFiles/deam1.dir/build
-.PHONY : deam1/fast
+demo1/fast:
+	$(MAKE) -f demo/CMakeFiles/demo1.dir/build.make demo/CMakeFiles/demo1.dir/build
+.PHONY : demo1/fast
 
-client.o: client.cc.o
+src/client.o: src/client.cc.o
 
-.PHONY : client.o
-
-# target to build an object file
-client.cc.o:
-	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/client.cc.o
-.PHONY : client.cc.o
-
-client.i: client.cc.i
-
-.PHONY : client.i
-
-# target to preprocess a source file
-client.cc.i:
-	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/client.cc.i
-.PHONY : client.cc.i
-
-client.s: client.cc.s
-
-.PHONY : client.s
-
-# target to generate assembly for a file
-client.cc.s:
-	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/client.cc.s
-.PHONY : client.cc.s
-
-make_test_json_file.o: make_test_json_file.cc.o
-
-.PHONY : make_test_json_file.o
+.PHONY : src/client.o
 
 # target to build an object file
-make_test_json_file.cc.o:
-	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.o
-.PHONY : make_test_json_file.cc.o
+src/client.cc.o:
+	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/src/client.cc.o
+.PHONY : src/client.cc.o
 
-make_test_json_file.i: make_test_json_file.cc.i
+src/client.i: src/client.cc.i
 
-.PHONY : make_test_json_file.i
+.PHONY : src/client.i
 
 # target to preprocess a source file
-make_test_json_file.cc.i:
-	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.i
-.PHONY : make_test_json_file.cc.i
+src/client.cc.i:
+	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/src/client.cc.i
+.PHONY : src/client.cc.i
 
-make_test_json_file.s: make_test_json_file.cc.s
+src/client.s: src/client.cc.s
 
-.PHONY : make_test_json_file.s
+.PHONY : src/client.s
 
 # target to generate assembly for a file
-make_test_json_file.cc.s:
-	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/make_test_json_file.cc.s
-.PHONY : make_test_json_file.cc.s
+src/client.cc.s:
+	$(MAKE) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/src/client.cc.s
+.PHONY : src/client.cc.s
 
-server.o: server.cc.o
+src/make_test_json_file.o: src/make_test_json_file.cc.o
 
-.PHONY : server.o
+.PHONY : src/make_test_json_file.o
 
 # target to build an object file
-server.cc.o:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.o
-.PHONY : server.cc.o
+src/make_test_json_file.cc.o:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/src/make_test_json_file.cc.o
+.PHONY : src/make_test_json_file.cc.o
 
-server.i: server.cc.i
+src/make_test_json_file.i: src/make_test_json_file.cc.i
 
-.PHONY : server.i
+.PHONY : src/make_test_json_file.i
 
 # target to preprocess a source file
-server.cc.i:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.i
-.PHONY : server.cc.i
+src/make_test_json_file.cc.i:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/src/make_test_json_file.cc.i
+.PHONY : src/make_test_json_file.cc.i
 
-server.s: server.cc.s
+src/make_test_json_file.s: src/make_test_json_file.cc.s
 
-.PHONY : server.s
+.PHONY : src/make_test_json_file.s
 
 # target to generate assembly for a file
-server.cc.s:
-	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/server.cc.s
-.PHONY : server.cc.s
+src/make_test_json_file.cc.s:
+	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/src/make_test_json_file.cc.s
+.PHONY : src/make_test_json_file.cc.s
+
+src/server.o: src/server.cc.o
+
+.PHONY : src/server.o
+
+# target to build an object file
+src/server.cc.o:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/src/server.cc.o
+.PHONY : src/server.cc.o
+
+src/server.i: src/server.cc.i
+
+.PHONY : src/server.i
+
+# target to preprocess a source file
+src/server.cc.i:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/src/server.cc.i
+.PHONY : src/server.cc.i
+
+src/server.s: src/server.cc.s
+
+.PHONY : src/server.s
+
+# target to generate assembly for a file
+src/server.cc.s:
+	$(MAKE) -f CMakeFiles/ser.dir/build.make CMakeFiles/ser.dir/src/server.cc.s
+.PHONY : src/server.cc.s
 
 # Help Target
 help:
@@ -281,17 +281,17 @@ help:
 	@echo "... ser"
 	@echo "... cli"
 	@echo "... CJsonTool"
-	@echo "... deam"
-	@echo "... deam1"
-	@echo "... client.o"
-	@echo "... client.i"
-	@echo "... client.s"
-	@echo "... make_test_json_file.o"
-	@echo "... make_test_json_file.i"
-	@echo "... make_test_json_file.s"
-	@echo "... server.o"
-	@echo "... server.i"
-	@echo "... server.s"
+	@echo "... demo"
+	@echo "... demo1"
+	@echo "... src/client.o"
+	@echo "... src/client.i"
+	@echo "... src/client.s"
+	@echo "... src/make_test_json_file.o"
+	@echo "... src/make_test_json_file.i"
+	@echo "... src/make_test_json_file.s"
+	@echo "... src/server.o"
+	@echo "... src/server.i"
+	@echo "... src/server.s"
 .PHONY : help
 
 
