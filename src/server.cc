@@ -1,4 +1,5 @@
 #include "include/common/common.h"
+#include "include/common/include/server.h"
 #include <map>
 #include <memory>
 #include <pthread.h>
@@ -534,8 +535,6 @@ void Do_read_wirte(int fd) {
                  reinterpret_cast<void *>(fd));
   pthread_attr_destroy(&att);
 }
-
-void usage() { fprintf(stderr, "./ser port\n"); }
 
 int main(int argc, char *argv[]) {
   // to do 注册退出信号
