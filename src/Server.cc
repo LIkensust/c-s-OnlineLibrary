@@ -1,9 +1,11 @@
 #include "include/common/include/server.h"
 #include "include/common/common.h"
 #include "include/socktool/sock_ser.hpp"
+#define EPOLLEVENTNUM 50
 using namespace std;
 static string ip = SERVERIP;
 static short port = SERVERPORT;
+static short EPOLLWAITTIME = 500;
 
 void all_works() {
   auto sock_tool = ListenSockTool::make();
@@ -13,10 +15,29 @@ void all_works() {
   ASSERT_MSG(sock_tool->start_listen() == OK, "start_listen failed");
   int listen_sock = sock_tool->get_sockfd();
   set_nonblock(listen_sock);
-  struct epoll_event ev, events[50];
+  struct epoll_event epoll_event, all_events[EPOLLEVENTNUM];
   shared_ptr<sockaddr> client_addr(new sockaddr);
   int epoll_fd = epoll_create(500);
   ASSERT_MSG(epoll_fd >= 0, "create epoll fail");
+  // put listen sock into epoll
+  // set the event with EPOLLIN|EPOLLET
+  epoll_event.data.fd = listen_sock;
+  epoll_event.events = EPOLLIN | EPOLLET;
+  epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_sock, &epoll_event);
+  int num_of_fds;
+  shared_ptr<sockaddr> addr(new sockaddr);
+  while (true) {
+    num_of_fds = epoll_wait(epoll_fd, all_events, EPOLLEVENTNUM, EPOLLWAITTIME);
+    for (int i = 0; i < num_of_fds; i++) {
+      if (all_events[i].data.fd == listen_sock) {
+#ifdef DEBUG
+        cout << "[=DEBUG=][accept request]" << endl;
+#endif
+        int client_fd = sock_tool->do_accept(addr);
+        //todo 
+      }
+    }
+  }
 
   // release listen_sock
   sock_tool.reset();

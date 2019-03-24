@@ -12,6 +12,7 @@ public:
   }
   int get_sockfd() { return sockfd_; }
   virtual int write_to_sock(std::shared_ptr<char> src, const size_t size) = 0;
+  virtual int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) = 0;
   void set_nonblock() {
     ASSERT_MSG(sock_is_open_ == true, "sock is not open when set nonblock");
     int options = fcntl(sockfd_, F_GETFL);
