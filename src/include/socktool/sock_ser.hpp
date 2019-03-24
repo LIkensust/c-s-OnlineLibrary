@@ -8,7 +8,7 @@ enum ERRTYPE { CREATESOCK = -1, BIND = -2, LISTEN = -3, OK = 0 };
 
 class ServerSockTool : public BaseSock {
 public:
-  std::unique_ptr<ServerSockTool> make() {
+  static std::unique_ptr<ServerSockTool> make() {
     return std::unique_ptr<ServerSockTool>(new ServerSockTool);
   }
 
@@ -57,6 +57,11 @@ public:
 
   int do_accept(std::shared_ptr<sockaddr> addr) {
     return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), NULL);
+  }
+
+  ~ServerSockTool() {
+    close(sockfd_);
+    std::cout<<"close fd"<<std::endl;
   }
 
 protected:

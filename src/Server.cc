@@ -1,22 +1,26 @@
 #include "include/common/include/server.h"
 #include "include/common/common.h"
 #include "include/socktool/sock_ser.hpp"
-#define IPREGEX                                                                \
-  "^([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[0-5]).([0-9]|[1-9][0-9]|1[0-" \
-  "9]{1,2}|2[0-4][0-9]|25[0-5]).([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[" \
-  "0-5]).([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])$"
 using namespace std;
-static string ip;
-static short port;
+static string ip = SERVERIP;
+static short port = SERVERPORT;
+
+void all_works() {
+  auto sock_tool = ServerSockTool::make();
+  sock_tool->set_ip(ip);
+  sock_tool->set_port(port);
+  ASSERT_MSG(sock_tool->open_sock()==OK,"open_sock failed");
+  ASSERT_MSG(sock_tool->start_listen()==OK,"start_listen failed");
+  int listen_sock = sock_tool->get_sockfd();
+  cout<<listen_sock<<endl;
+}
 
 int main(int argc, char *argv[]) {
-  if (argc <= 1) {
-    usage();
-    return 1;
-  }
   int option;
+  bool customize = false;
   while ((option = getopt(argc, argv, "p:l:")) != -1) {
-    if (option == 'p') {
+    switch (option) {
+    case 'p': {
       auto regex_tool = RegexTool::make();
       regex_tool->set_regex("[0-9]*");
       vector<pair<int, int>> tmp = regex_tool->check_str(optarg);
@@ -25,8 +29,10 @@ int main(int argc, char *argv[]) {
         ASSERT_MSG(false, "port must be num and not null");
       }
       port = atoi(optarg);
+      customize = true;
+      break;
     }
-    if (option == 'l') {
+    case 'l': {
       auto regex_tool = RegexTool::make();
       regex_tool->set_regex(IPREGEX);
       vector<pair<int, int>> tmp = regex_tool->check_str(optarg);
@@ -35,10 +41,23 @@ int main(int argc, char *argv[]) {
         ASSERT_MSG(false, "ip must be 0.0.0.0 ~ 255.255.255.255");
       }
       ip = optarg;
+      customize = true;
+      break;
+    }
+    case '?': {
+      cout << "[Using an unknow option]" << endl;
+      return -1;
+      break;
+    }
     }
   }
-  cout << "[Using customized:]" << endl;
+  if (customize == true) {
+    cout << "[Using customized setting]" << endl;
+  } else {
+    cout << "[Using default setting]" << endl;
+  }
   cout << "[ip:] " << ip << endl;
   cout << "[port:] " << port << endl;
+  all_works();  // start
   return 0;
 }
