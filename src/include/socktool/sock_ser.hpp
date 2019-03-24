@@ -34,6 +34,7 @@ public:
     if (sockfd_ == -1) {
       return CREATESOCK;
     }
+    ::set_nonblock(sockfd_);
     sockaddr_in host_sock;
     bzero(&host_sock, sizeof(sockaddr_in));
     host_sock.sin_family = AF_INET;

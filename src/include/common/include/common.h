@@ -39,8 +39,8 @@
   "0-5]).([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])$"
 
 void set_nonblock(int fd) {
-  int options = fcntl(fd, F_GETFL);
-  ASSERT_MSG(options >= 0, "set nonblock fail");
-  options |= O_NONBLOCK;
-  ASSERT_MSG(fcntl(fd, F_SETFL, options) >= 0, "set nonblock fail");
+  int opt = fcntl(fd, F_GETFL);
+  ASSERT_MSG(opt >= -1, "set nonblock fail:option is less than 0");
+  opt |= O_NONBLOCK;
+  ASSERT_MSG(fcntl(fd, F_SETFL, opt) >= 0, "set nonblock fail");
 }

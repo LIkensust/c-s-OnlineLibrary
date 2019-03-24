@@ -1,6 +1,7 @@
 #include "include/common/include/server.h"
 #include "include/common/common.h"
 #include "include/socktool/sock_ser.hpp"
+#define DEBUG
 #define EPOLLEVENTNUM 50
 using namespace std;
 static string ip = SERVERIP;
@@ -14,7 +15,9 @@ void all_works() {
   ASSERT_MSG(sock_tool->open_sock() == OK, "open_sock failed");
   ASSERT_MSG(sock_tool->start_listen() == OK, "start_listen failed");
   int listen_sock = sock_tool->get_sockfd();
-  set_nonblock(listen_sock);
+#ifdef DEBUG
+  cout<<"[=DEBUG=][Listen at "<<listen_sock<<"]"<<endl;
+#endif
   struct epoll_event epoll_event, all_events[EPOLLEVENTNUM];
   shared_ptr<sockaddr> client_addr(new sockaddr);
   int epoll_fd = epoll_create(500);
@@ -34,7 +37,25 @@ void all_works() {
         cout << "[=DEBUG=][accept request]" << endl;
 #endif
         int client_fd = sock_tool->do_accept(addr);
-        //todo 
+        if(client_fd < 0) {
+#ifdef DEBUG
+          perror("accrpt");
+#endif
+        }
+        set_nonblock(client_fd);
+#ifdef DEBUG
+        char *set = inet_ntoa(reinterpret_cast<sockaddr_in*>(addr.get())->sin_addr);
+        cout << "[=DEBUG=][connect with:] "<<set<<endl; 
+#endif
+        epoll_event.data.fd = client_fd;
+        epoll_event.events = EPOLLIN | EPOLLET;
+        epoll_ctl(epoll_fd,EPOLL_CTL_ADD,client_fd,&epoll_event);
+      } else if (all_events[i].events & EPOLLIN) {
+        int client_fd = all_events[i].data.fd;
+        if(client_fd < 0) {
+          continue;
+        }
+            
       }
     }
   }

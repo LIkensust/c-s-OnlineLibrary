@@ -1,10 +1,8 @@
 #pragma once
 #include "common.h"
-enum SOCKSTATUS { NONBLOCK, BLOCK };
-
 class BaseSock {
 public:
-  BaseSock() : sockfd_(-1), sock_status_(BLOCK), sock_is_open_(false) {}
+  BaseSock() : sockfd_(-1), sock_is_open_(false) {}
   virtual ~BaseSock() {
     if (sock_is_open_) {
       close(sockfd_);
@@ -15,23 +13,20 @@ public:
   virtual int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) = 0;
   void set_nonblock() {
     ASSERT_MSG(sock_is_open_ == true, "sock is not open when set nonblock");
-    int options = fcntl(sockfd_, F_GETFL);
-    ASSERT_MSG(options >= 0, "set nonblock fail");
-    options |= O_NONBLOCK;
-    ASSERT_MSG(fcntl(sockfd_, F_SETFL, options) >= 0, "set nonblock fail");
-    sock_status_ = NONBLOCK;
+    int opt = fcntl(sockfd_, F_GETFL);
+    ASSERT_MSG(opt >= 0, "set nonblock fail");
+    opt |= O_NONBLOCK;
+    ASSERT_MSG(fcntl(sockfd_, F_SETFL, opt) >= 0, "set nonblock fail");
   }
   void set_block() {
     ASSERT_MSG(sock_is_open_ == true, "sock is not open when set block");
-    int options = fcntl(sockfd_, F_GETFL);
-    ASSERT_MSG(options >= 0, "set nonblock fail");
-    options &= ~O_NONBLOCK;
-    ASSERT_MSG(fcntl(sockfd_, F_SETFL, options) >= 0, "set block fail");
-    sock_status_ = BLOCK;
+    int opt = fcntl(sockfd_, F_GETFL);
+    ASSERT_MSG(opt >= 0, "set nonblock fail");
+    opt &= ~O_NONBLOCK;
+    ASSERT_MSG(fcntl(sockfd_, F_SETFL, opt) >= 0, "set block fail");
   }
 
 protected:
   int sockfd_;
-  int sock_status_;
   bool sock_is_open_;
 };
