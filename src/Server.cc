@@ -9,10 +9,16 @@ void all_works() {
   auto sock_tool = ServerSockTool::make();
   sock_tool->set_ip(ip);
   sock_tool->set_port(port);
-  ASSERT_MSG(sock_tool->open_sock()==OK,"open_sock failed");
-  ASSERT_MSG(sock_tool->start_listen()==OK,"start_listen failed");
+  ASSERT_MSG(sock_tool->open_sock() == OK, "open_sock failed");
+  ASSERT_MSG(sock_tool->start_listen() == OK, "start_listen failed");
   int listen_sock = sock_tool->get_sockfd();
-  cout<<listen_sock<<endl;
+  set_nonblock(listen_sock);
+  struct epoll_event ev, events[50];
+  shared_ptr<sockaddr> client_addr(new sockaddr);
+  int epoll_fd = epoll_create(500);
+  ASSERT_MSG(epoll_fd >= 0, "create epoll fail");
+
+  sock_tool.reset();
 }
 
 int main(int argc, char *argv[]) {
@@ -58,6 +64,6 @@ int main(int argc, char *argv[]) {
   }
   cout << "[ip:] " << ip << endl;
   cout << "[port:] " << port << endl;
-  all_works();  // start
+  all_works(); // start
   return 0;
 }

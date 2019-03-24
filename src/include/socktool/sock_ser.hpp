@@ -45,6 +45,7 @@ public:
     if (bind_status == -1) {
       return BIND;
     }
+    sock_is_open_ = true;
     return OK;
   }
 
@@ -60,12 +61,13 @@ public:
   }
 
   ~ServerSockTool() {
-    close(sockfd_);
-    std::cout<<"close fd"<<std::endl;
+    if (sock_is_open_ == true)
+      close(sockfd_);
   }
 
 protected:
-  ServerSockTool() : status_(0), port_(0) {}
+  ServerSockTool() : sock_is_open_(false), status_(0), port_(0) {}
+  bool sock_is_open_;
   int status_;
   std::string ip_;
   short port_;

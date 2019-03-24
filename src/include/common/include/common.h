@@ -1,5 +1,4 @@
-#ifndef __HEAD_H__
-#define __HEAD_H__
+#pragma once
 // C++ head
 #include <iostream>
 #include <memory>
@@ -38,4 +37,10 @@
   "^([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[0-5]).([0-9]|[1-9][0-9]|1[0-" \
   "9]{1,2}|2[0-4][0-9]|25[0-5]).([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[" \
   "0-5]).([0-9]|[1-9][0-9]|1[0-9]{1,2}|2[0-4][0-9]|25[0-5])$"
-#endif //__HEAD_H__
+
+void set_nonblock(int fd) {
+  int options = fcntl(fd, F_GETFL);
+  ASSERT_MSG(options >= 0, "set nonblock fail");
+  options |= O_NONBLOCK;
+  ASSERT_MSG(fcntl(fd, F_SETFL, options) >= 0, "set nonblock fail");
+}
