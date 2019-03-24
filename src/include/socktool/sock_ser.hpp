@@ -2,23 +2,22 @@
 #include "../common/common.h"
 #include "../common/include/base_sock.hpp"
 #include "../common/include/server.h"
-enum STATUS { SETIP = 1 << 0, SETPORT = 1 << 1 };
-
+enum LISTENSOCKSTATUS { SETIP = 1 << 0, SETPORT = 1 << 1 };
 enum ERRTYPE { CREATESOCK = -1, BIND = -2, LISTEN = -3, OK = 0 };
-
-class ServerSockTool : public BaseSock {
+enum SERVERCONNECTSOCKSTATUS { SETSOCK, EMPTYSOCK };
+class ListenSockTool : public BaseSock {
 public:
-  static std::unique_ptr<ServerSockTool> make() {
-    return std::unique_ptr<ServerSockTool>(new ServerSockTool);
+  static std::unique_ptr<ListenSockTool> make() {
+    return std::unique_ptr<ListenSockTool>(new ListenSockTool);
   }
 
-  ServerSockTool &set_ip(const std::string &ip) {
+  ListenSockTool &set_ip(const std::string &ip) {
     ip_ = ip;
     status_ |= SETIP;
     return *this;
   }
 
-  ServerSockTool &set_port(const int port) {
+  ListenSockTool &set_port(const int port) {
     port_ = port;
     status_ |= SETPORT;
     return *this;
@@ -60,15 +59,79 @@ public:
     return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), NULL);
   }
 
-  ~ServerSockTool() {
+  ~ListenSockTool() {
     if (sock_is_open_ == true)
       close(sockfd_);
   }
 
 protected:
-  ServerSockTool() : sock_is_open_(false), status_(0), port_(0) {}
-  bool sock_is_open_;
+  ListenSockTool() : status_(0), port_(0) {}
   int status_;
   std::string ip_;
   short port_;
+};
+
+class ServerConnetSockTool : public BaseSock {
+public:
+  ServerConnetSockTool() : status_(EMPTYSOCK) {}
+  ServerConnetSockTool(int sock) {
+    sockfd_ = sock;
+    sock_is_open_ = true;
+    status_ = SETSOCK;
+  }
+  void set_sockfd(int sock) {
+    ASSERT_MSG(sock >= 0, "sock is less then 0 when set sockfd");
+    sock_is_open_ = true;
+    sockfd_ = sock;
+    status_ = SETSOCK;
+  }
+
+  int write_to_sock(std::shared_ptr<char> src, const size_t size) {
+    ASSERT_MSG(src != NULL, "src is NULL when writing");
+    ASSERT_MSG(sock_is_open_ == true, "sock is not open when wirting");
+    size_t tmp;
+    size_t total = size;
+    const char *ptr = src.get();
+    while (total > 0) {
+      tmp = write(sockfd_, ptr, total);
+      if (tmp < 0) {
+        if (tmp == 0) {
+          return -2;
+        }
+        if (errno == EINTR)
+          return -1;
+        if (errno == EAGAIN) {
+          usleep(500);
+          continue;
+        }
+      }
+      if (tmp == total)
+        return size;
+      total -= tmp;
+      ptr += tmp;
+    }
+    return tmp;
+  }
+
+  int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) {
+    char *buff = dir.get();
+    ASSERT_MSG(buff == NULL, "buff is point to NULL when read");
+    int index = 0;
+    int read_size = 0;
+    char *ptr = buff;
+    while (buffer_size > 1) {
+      read_size = read(sockfd_, ptr + index, buffer_size - 1);
+      index += read_size;
+      buffer_size -= read_size;
+      if (read_size == 0) {
+        return -2;
+      } else if (read_size == -1 && errno != EAGAIN) {
+        return -2;
+      }
+    }
+    return index;
+  }
+
+protected:
+  int status_;
 };

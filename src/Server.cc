@@ -6,7 +6,7 @@ static string ip = SERVERIP;
 static short port = SERVERPORT;
 
 void all_works() {
-  auto sock_tool = ServerSockTool::make();
+  auto sock_tool = ListenSockTool::make();
   sock_tool->set_ip(ip);
   sock_tool->set_port(port);
   ASSERT_MSG(sock_tool->open_sock() == OK, "open_sock failed");
@@ -18,6 +18,7 @@ void all_works() {
   int epoll_fd = epoll_create(500);
   ASSERT_MSG(epoll_fd >= 0, "create epoll fail");
 
+  // release listen_sock
   sock_tool.reset();
 }
 
