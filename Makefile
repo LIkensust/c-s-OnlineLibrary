@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/liyuan/study/c-s_base_OnlineLibrary
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -122,6 +122,19 @@ CreateJson: cmake_check_build_system
 CreateJson/fast:
 	$(MAKE) -f CMakeFiles/CreateJson.dir/build.make CMakeFiles/CreateJson.dir/build
 .PHONY : CreateJson/fast
+
+#=============================================================================
+# Target rules for targets named redo
+
+# Build rule for target.
+redo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 redo
+.PHONY : redo
+
+# fast build rule for target.
+redo/fast:
+	$(MAKE) -f CMakeFiles/redo.dir/build.make CMakeFiles/redo.dir/build
+.PHONY : redo/fast
 
 #=============================================================================
 # Target rules for targets named ser
@@ -187,6 +200,33 @@ demo1: cmake_check_build_system
 demo1/fast:
 	$(MAKE) -f demo/CMakeFiles/demo1.dir/build.make demo/CMakeFiles/demo1.dir/build
 .PHONY : demo1/fast
+
+src/Server.o: src/Server.cc.o
+
+.PHONY : src/Server.o
+
+# target to build an object file
+src/Server.cc.o:
+	$(MAKE) -f CMakeFiles/redo.dir/build.make CMakeFiles/redo.dir/src/Server.cc.o
+.PHONY : src/Server.cc.o
+
+src/Server.i: src/Server.cc.i
+
+.PHONY : src/Server.i
+
+# target to preprocess a source file
+src/Server.cc.i:
+	$(MAKE) -f CMakeFiles/redo.dir/build.make CMakeFiles/redo.dir/src/Server.cc.i
+.PHONY : src/Server.cc.i
+
+src/Server.s: src/Server.cc.s
+
+.PHONY : src/Server.s
+
+# target to generate assembly for a file
+src/Server.cc.s:
+	$(MAKE) -f CMakeFiles/redo.dir/build.make CMakeFiles/redo.dir/src/Server.cc.s
+.PHONY : src/Server.cc.s
 
 src/client.o: src/client.cc.o
 
@@ -275,14 +315,18 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... CreateJson"
+	@echo "... rebuild_cache"
+	@echo "... redo"
 	@echo "... ser"
 	@echo "... cli"
 	@echo "... CJsonTool"
 	@echo "... demo"
 	@echo "... demo1"
+	@echo "... src/Server.o"
+	@echo "... src/Server.i"
+	@echo "... src/Server.s"
 	@echo "... src/client.o"
 	@echo "... src/client.i"
 	@echo "... src/client.s"

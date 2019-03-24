@@ -23,4 +23,15 @@
 #include <unistd.h>
 // thirdpart
 #include "../../CJsonObject/CJsonObject.hpp"
+
+#define ASSERT_MSG(op, msg)                                                    \
+  do {                                                                         \
+    if (!(op)) {                                                               \
+      std::cout << "In file:" << __FILE__ << std::endl;                        \
+      std::cout << "Line :" << __LINE__ << std::endl;                          \
+      std::cout << msg << std::endl;                                           \
+      _exit(1);                                                                \
+    }                                                                          \
+  } while (0)
+
 #endif //__HEAD_H__

@@ -9,9 +9,11 @@ add_subdirectory(CJsonObject)
 add_subdirectory(demo)
 add_executable(ser src/server.cc)
 add_executable(cli src/client.cc)
+add_executable(redo src/Server.cc)
 add_executable(CreateJson src/make_test_json_file.cc)
 
 
 target_link_libraries(ser ${LIB_NAME})
 target_link_libraries(cli ${LIB_NAME})
+target_link_libraries(redo ${LIB_NAME})
 target_link_libraries(CreateJson ${LIB_NAME})
