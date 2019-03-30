@@ -9,7 +9,9 @@ typedef std::pair<TaskPriority, Task> TaskPair;
 
 class ThreadPool {
 public:
-  static ThreadPool make(int n = THREADPOOLSIZE) { return *(new ThreadPool(n)); }
+  static ThreadPool make(int n = THREADPOOLSIZE) {
+    return *(new ThreadPool(n));
+  }
   ~ThreadPool() {
     if (pool_is_start_) {
       stop();
@@ -23,6 +25,7 @@ public:
     pool_is_start_ = false;
     pthread_cond_broadcast(&cond_);
     pthread_mutex_unlock(&mutex_);
+    pthread_cond_broadcast(&cond_);
     for (auto it = threads_.begin(); it != threads_.end(); it++) {
       (*it)->join();
       delete *it;
@@ -45,27 +48,43 @@ public:
       tasks_.pop();
       ASSERT_MSG(tmpsize - 1 == tasks_.size(),
                  "ERR when threadpool take task!");
+#ifdef DEBUG
+      std::cout << "[=DEBUG=][take a task]" << std::endl;
+#endif
     }
+    pthread_mutex_unlock(&mutex_);
     return task;
   }
 
   void thread_loop() {
 #ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_loop : " << std::thread::get_id()
+    std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
               << " start]" << std::endl;
 #endif
     while (pool_is_start_) {
+#ifdef DEBUG
+      std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
+                << " is in loop]" << std::endl;
+#endif
       Task task = take();
-      if (task != nullptr)
-        task();
+      if (task != nullptr) {
+#ifdef DEBUG
+        std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
+                  << " take a task]" << std::endl;
+#endif
+        task(NULL);
+      }
     }
 #ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_loop : " << std::thread::get_id() << " exit]"
-              << std::endl;
+    std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
+              << " exit]" << std::endl;
 #endif
   }
 
   void add_task(const Task &task, TaskPriority priority = NO_2) {
+#ifdef DEBUG
+    std::cout << "[=DEBUG=][add task to thread pool]" << std::endl;
+#endif
     pthread_mutex_lock(&mutex_);
     TaskPair taskpair(priority, task);
     tasks_.push(taskpair);
@@ -76,7 +95,12 @@ public:
   void start() {
     ASSERT_MSG(threads_.empty(), "Thread list is not empty when start!");
     ASSERT_MSG(pool_is_start_ == false, "Restart threadpool!");
+#ifdef DEBUG
+    std::cout << "[=DEBUG=][thread_pool size is " << init_thread_size_ << " ]"
+              << std::endl;
+#endif
     threads_.reserve(init_thread_size_);
+    pool_is_start_ = true;
     for (size_t i = 1; i <= init_thread_size_; i++) {
       threads_.push_back(
           new std::thread(std::bind(&ThreadPool::thread_loop, this)));
@@ -88,7 +112,7 @@ private:
     pthread_mutex_init(&mutex_, NULL);
     pthread_cond_init(&cond_, NULL);
   };
-  ThreadPool(const ThreadPool &);
+  // ThreadPool(const ThreadPool &);
   const ThreadPool &operator=(const ThreadPool &);
   struct TaskPriorityCmp {
     bool operator()(const TaskPair p1, const TaskPair p2) {

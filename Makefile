@@ -189,6 +189,19 @@ demo2/fast:
 .PHONY : demo2/fast
 
 #=============================================================================
+# Target rules for targets named thread_demo
+
+# Build rule for target.
+thread_demo: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 thread_demo
+.PHONY : thread_demo
+
+# fast build rule for target.
+thread_demo/fast:
+	$(MAKE) -f demo/CMakeFiles/thread_demo.dir/build.make demo/CMakeFiles/thread_demo.dir/build
+.PHONY : thread_demo/fast
+
+#=============================================================================
 # Target rules for targets named demo
 
 # Build rule for target.
@@ -336,6 +349,7 @@ help:
 	@echo "... cli"
 	@echo "... CJsonTool"
 	@echo "... demo2"
+	@echo "... thread_demo"
 	@echo "... demo"
 	@echo "... demo1"
 	@echo "... src/Server.o"
