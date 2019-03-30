@@ -17,7 +17,7 @@ public:
     return *this;
   }
 
-  ListenSockTool &set_port(const int port) {
+  ListenSockTool &set_port(const short port) {
     port_ = port;
     status_ |= SETPORT;
     return *this;
@@ -34,7 +34,7 @@ public:
     if (sockfd_ == -1) {
       return CREATESOCK;
     }
-    ::set_nonblock(sockfd_);
+    set_nonblock(sockfd_);
     sockaddr_in host_sock;
     bzero(&host_sock, sizeof(sockaddr_in));
     host_sock.sin_family = AF_INET;
@@ -56,8 +56,10 @@ public:
     return OK;
   }
 
-  int do_accept(std::shared_ptr<sockaddr> addr) {
-    return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), NULL);
+  int do_accept(std::shared_ptr<sockaddr> addr,socklen_t *len = NULL) {
+    socklen_t sockaddr_size;
+    socklen_t *ptr = (len == NULL)?(&sockaddr_size):len; 
+    return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), ptr); 
   }
 
   ~ListenSockTool() {

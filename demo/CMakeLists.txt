@@ -1,4 +1,6 @@
 add_executable(demo Mysqldeam.cc)
 add_executable(demo1 mysqldemo2.cc)
+add_executable(demo2 set_nonblocked.cc)
 target_link_libraries(demo ${LIB_NAME})
 target_link_libraries(demo1 ${LIB_NAME})
+target_link_libraries(demo2 ${LIB_NAME})

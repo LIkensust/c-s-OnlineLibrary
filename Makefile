@@ -176,6 +176,19 @@ CJsonTool/fast:
 .PHONY : CJsonTool/fast
 
 #=============================================================================
+# Target rules for targets named demo2
+
+# Build rule for target.
+demo2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 demo2
+.PHONY : demo2
+
+# fast build rule for target.
+demo2/fast:
+	$(MAKE) -f demo/CMakeFiles/demo2.dir/build.make demo/CMakeFiles/demo2.dir/build
+.PHONY : demo2/fast
+
+#=============================================================================
 # Target rules for targets named demo
 
 # Build rule for target.
@@ -322,6 +335,7 @@ help:
 	@echo "... ser"
 	@echo "... cli"
 	@echo "... CJsonTool"
+	@echo "... demo2"
 	@echo "... demo"
 	@echo "... demo1"
 	@echo "... src/Server.o"
