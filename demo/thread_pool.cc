@@ -19,13 +19,17 @@ void fun(void *data) {
 int main() {
   auto thread_pool = threadpool::ThreadPool::make(3);
   thread_pool.start();
-  Data *d = new Data;
+  vector<Data *> v;
   for (int i = 0; i < 100; i++) {
+    Data *d = new Data;
     d->a_ = i;
     d->b_ = i + 1;
     thread_pool.add_task(bind(fun, d));
+    v.push_back(d);
   }
-  sleep(3);
-  thread_pool.stop();
+  sleep(2);
+  for (int i = 0; i < 100; i++) {
+    delete v[i];
+  }
   return 0;
 }

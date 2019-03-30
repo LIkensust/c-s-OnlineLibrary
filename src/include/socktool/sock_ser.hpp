@@ -124,7 +124,10 @@ public:
 
   int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) {
     char *buff = dir.get();
-    ASSERT_MSG(buff == NULL, "buff is point to NULL when read");
+    ASSERT_MSG(buff != NULL, "buff is point to NULL when read");
+#ifdef DEBUG
+    std::cout << "[=DEBUG=][start read data]" << std::endl;
+#endif
     int index = 0;
     int read_size = 0;
     char *ptr = buff;
@@ -136,6 +139,8 @@ public:
         return -2;
       } else if (read_size == -1 && errno != EAGAIN) {
         return -2;
+      } else {
+        break;
       }
     }
     return index;

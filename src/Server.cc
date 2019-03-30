@@ -1,11 +1,30 @@
 #include "include/common/include/server.h"
 #include "include/common/common.h"
 #include "include/socktool/sock_ser.hpp"
+#include "include/thread_pool/thread_pool.h"
 #define EPOLLEVENTNUM 50
 using namespace std;
 static string ip = SERVERIP;
 static short port = SERVERPORT;
 static short EPOLLWAITTIME = 500;
+
+void recv_and_work(void *client_fd) {
+  if (client_fd == NULL) {
+    return;
+  }
+  int cli_fd = *(int *)client_fd;
+  delete (int *)client_fd;
+  auto client_tool = ServerConnetSockTool();
+  client_tool.set_sockfd(cli_fd);
+  shared_ptr<char> buff(new char[1024]);
+  client_tool.read_from_sock(buff, 1024);
+#ifdef DEBUG
+  cout << "[=DEBUG=][get message :] " << buff.get() << endl;
+#endif
+  shared_ptr<char> buff_echo(new char[1024]);
+  sprintf(buff_echo.get(), "I am server.I get :%s", buff.get());
+  client_tool.write_to_sock(buff_echo, strlen(buff_echo.get()));
+}
 
 void all_works() {
   auto sock_tool = ListenSockTool::make();
@@ -28,6 +47,8 @@ void all_works() {
   epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_sock, &one_event);
   int num_of_fds;
   shared_ptr<sockaddr> addr(new sockaddr);
+  auto thread_pool = threadpool::ThreadPool::make(10);
+  thread_pool.start();
   while (true) {
     num_of_fds = epoll_wait(epoll_fd, all_events, EPOLLEVENTNUM, EPOLLWAITTIME);
     for (int i = 0; i < num_of_fds; i++) {
@@ -55,7 +76,9 @@ void all_works() {
         if (client_fd < 0) {
           continue;
         } else {
-          // read data
+          int *p = new int;
+          *p = client_fd;
+          thread_pool.add_task(bind(recv_and_work, (void *)p));
         }
       }
     }
