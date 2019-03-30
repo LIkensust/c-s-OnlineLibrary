@@ -1,8 +1,13 @@
 #pragma once
 // C++ head
+#include <functional>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <string>
+#include <thread>
+#include <utility>
 #include <vector>
 // C head
 #include <arpa/inet.h>

@@ -56,10 +56,10 @@ public:
     return OK;
   }
 
-  int do_accept(std::shared_ptr<sockaddr> addr,socklen_t *len = NULL) {
+  int do_accept(std::shared_ptr<sockaddr> addr, socklen_t *len = NULL) {
     socklen_t sockaddr_size;
-    socklen_t *ptr = (len == NULL)?(&sockaddr_size):len; 
-    return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), ptr); 
+    socklen_t *ptr = (len == NULL) ? (&sockaddr_size) : len;
+    return accept(sockfd_, reinterpret_cast<sockaddr *>(addr.get()), ptr);
   }
 
   ~ListenSockTool() {

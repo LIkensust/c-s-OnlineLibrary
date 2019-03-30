@@ -17,15 +17,15 @@ void all_works() {
 #ifdef DEBUG
   cout << "[=DEBUG=][Listen at " << listen_sock << "]" << endl;
 #endif
-  struct epoll_event epoll_event, all_events[EPOLLEVENTNUM];
+  epoll_event one_event, all_events[EPOLLEVENTNUM];
   shared_ptr<sockaddr> client_addr(new sockaddr);
   int epoll_fd = epoll_create(500);
   ASSERT_MSG(epoll_fd >= 0, "create epoll fail");
   // put listen sock into epoll
   // set the event with EPOLLIN|EPOLLET
-  epoll_event.data.fd = listen_sock;
-  epoll_event.events = EPOLLIN | EPOLLET;
-  epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_sock, &epoll_event);
+  one_event.data.fd = listen_sock;
+  one_event.events = EPOLLIN | EPOLLET;
+  epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_sock, &one_event);
   int num_of_fds;
   shared_ptr<sockaddr> addr(new sockaddr);
   while (true) {
@@ -47,15 +47,15 @@ void all_works() {
             inet_ntoa(reinterpret_cast<sockaddr_in *>(addr.get())->sin_addr);
         cout << "[=DEBUG=][connect with:] " << set << endl;
 #endif
-        epoll_event.data.fd = client_fd;
-        epoll_event.events = EPOLLIN | EPOLLET;
-        epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &epoll_event);
+        one_event.data.fd = client_fd;
+        one_event.events = EPOLLIN | EPOLLET;
+        epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &one_event);
       } else if (all_events[i].events & EPOLLIN) {
         int client_fd = all_events[i].data.fd;
         if (client_fd < 0) {
           continue;
         } else {
-          //read data
+          // read data
         }
       }
     }
