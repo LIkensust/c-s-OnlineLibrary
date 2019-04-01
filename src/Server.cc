@@ -119,6 +119,7 @@ int main(int argc, char *argv[]) {
     }
     case '?': {
       cout << "[Using an unknow option]" << endl;
+      usage();
       return -1;
       break;
     }

@@ -31,8 +31,8 @@ public:
       delete *it;
     }
     threads_.clear();
-#ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_pool is closed]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+    std::cout << "[=THREADPOOL_DEBUG=][thread_pool is closed]" << std::endl;
 #endif
   }
 
@@ -48,8 +48,8 @@ public:
       tasks_.pop();
       ASSERT_MSG(tmpsize - 1 == tasks_.size(),
                  "ERR when threadpool take task!");
-#ifdef DEBUG
-      std::cout << "[=DEBUG=][take a task]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+      std::cout << "[=THREADPOOL_DEBUG=][take a task]" << std::endl;
 #endif
     }
     pthread_mutex_unlock(&mutex_);
@@ -57,33 +57,33 @@ public:
   }
 
   void thread_loop() {
-#ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
-              << " start]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+    std::cout << "[=THREADPOOL_DEBUG=][thread_loop : "
+              << std::this_thread::get_id() << " start]" << std::endl;
 #endif
     while (pool_is_start_) {
-#ifdef DEBUG
-      std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
-                << " is in loop]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+      std::cout << "[=THREADPOOL_DEBUG=][thread_loop : "
+                << std::this_thread::get_id() << " is in loop]" << std::endl;
 #endif
       Task task = take();
       if (task != nullptr) {
-#ifdef DEBUG
-        std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
-                  << " take a task]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+        std::cout << "[=THREADPOOL_DEBUG=][thread_loop : "
+                  << std::this_thread::get_id() << " take a task]" << std::endl;
 #endif
         task(NULL);
       }
     }
-#ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_loop : " << std::this_thread::get_id()
-              << " exit]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+    std::cout << "[=THREADPOOL_DEBUG=][thread_loop : "
+              << std::this_thread::get_id() << " exit]" << std::endl;
 #endif
   }
 
   void add_task(const Task &task, TaskPriority priority = NO_2) {
-#ifdef DEBUG
-    std::cout << "[=DEBUG=][add task to thread pool]" << std::endl;
+#ifdef THREADPOOL_DEBUG
+    std::cout << "[=THREADPOOL_DEBUG=][add task to thread pool]" << std::endl;
 #endif
     pthread_mutex_lock(&mutex_);
     TaskPair taskpair(priority, task);
@@ -95,9 +95,9 @@ public:
   void start() {
     ASSERT_MSG(threads_.empty(), "Thread list is not empty when start!");
     ASSERT_MSG(pool_is_start_ == false, "Restart threadpool!");
-#ifdef DEBUG
-    std::cout << "[=DEBUG=][thread_pool size is " << init_thread_size_ << " ]"
-              << std::endl;
+#ifdef THREADPOOL_DEBUG
+    std::cout << "[=THREADPOOL_DEBUG=][thread_pool size is "
+              << init_thread_size_ << " ]" << std::endl;
 #endif
     threads_.reserve(init_thread_size_);
     pool_is_start_ = true;
