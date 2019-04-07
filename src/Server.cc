@@ -8,12 +8,18 @@ static string ip = SERVERIP;
 static short port = SERVERPORT;
 static short EPOLLWAITTIME = 500;
 
-void recv_and_work(void *client_fd) {
-  if (client_fd == NULL) {
+struct DataBlob {
+  int client_fd;
+  int epoll_fd;
+};
+
+void recv_and_work(void *datablob) {
+  if (datablob == NULL) {
     return;
   }
-  int cli_fd = *(int *)client_fd;
-  delete (int *)client_fd;
+  int cli_fd = ((DataBlob *)datablob)->client_fd;
+  int epoll_fd = ((DataBlob *)datablob)->epoll_fd;
+  delete (DataBlob *)datablob;
   auto client_tool = ServerConnetSockTool();
   client_tool.set_sockfd(cli_fd);
   shared_ptr<char> buff(new char[1024]);
@@ -24,6 +30,11 @@ void recv_and_work(void *client_fd) {
   shared_ptr<char> buff_echo(new char[1024]);
   sprintf(buff_echo.get(), "I am server.I get :%s", buff.get());
   client_tool.write_to_sock(buff_echo, strlen(buff_echo.get()));
+  client_tool.set_no_close();
+  epoll_event event;
+  event.data.fd = cli_fd;
+  event.events = EPOLLIN | EPOLLET;
+  epoll_ctl(epoll_fd,EPOLL_CTL_MOD,cli_fd,&event);
 }
 
 void all_works() {
@@ -76,8 +87,9 @@ void all_works() {
         if (client_fd < 0) {
           continue;
         } else {
-          int *p = new int;
-          *p = client_fd;
+          DataBlob *p = new DataBlob;
+          p->client_fd = client_fd;
+          p->epoll_fd = epoll_fd;
           thread_pool.add_task(bind(recv_and_work, (void *)p));
         }
       }

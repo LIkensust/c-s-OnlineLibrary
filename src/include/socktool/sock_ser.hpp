@@ -118,6 +118,11 @@ public:
     return tmp;
   }
 
+  void set_no_close() {
+    sock_is_open_ = false;
+    sockfd_ = -1;
+  }
+
   int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) {
     char *buff = dir.get();
     ASSERT_MSG(buff != NULL, "buff is point to NULL when read");
