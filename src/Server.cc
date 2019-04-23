@@ -34,7 +34,7 @@ void recv_and_work(void *datablob) {
   epoll_event event;
   event.data.fd = cli_fd;
   event.events = EPOLLIN | EPOLLET;
-  epoll_ctl(epoll_fd,EPOLL_CTL_MOD,cli_fd,&event);
+  epoll_ctl(epoll_fd, EPOLL_CTL_MOD, cli_fd, &event);
 }
 
 void all_works() {
