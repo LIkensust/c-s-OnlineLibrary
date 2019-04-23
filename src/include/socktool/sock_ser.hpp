@@ -68,12 +68,8 @@ public:
   }
 
 protected:
-  virtual int write_to_sock(std::shared_ptr<char> src, const size_t size) {
-    return -1;
-  };
-  virtual int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) {
-    return -1;
-  };
+  virtual int write_to_sock(std::shared_ptr<char>, const size_t) { return -1; };
+  virtual int read_from_sock(std::shared_ptr<char>, size_t) { return -1; };
   ListenSockTool() : status_(0), port_(0) {}
   int status_;
   std::string ip_;
@@ -120,6 +116,11 @@ public:
       ptr += tmp;
     }
     return tmp;
+  }
+
+  void set_no_close() {
+    sock_is_open_ = false;
+    sockfd_ = -1;
   }
 
   int read_from_sock(std::shared_ptr<char> dir, size_t buffer_size) {
