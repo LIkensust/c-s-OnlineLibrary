@@ -43,6 +43,8 @@ void all_works() {
   sock_tool->set_port(port);
   ASSERT_MSG(sock_tool->open_sock() == OK, "open_sock failed");
   ASSERT_MSG(sock_tool->start_listen() == OK, "start_listen failed");
+
+  
   int listen_sock = sock_tool->get_sockfd();
 #ifdef DEBUG
   cout << "[=DEBUG=][Listen at " << listen_sock << "]" << endl;
