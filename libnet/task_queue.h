@@ -2,8 +2,9 @@
 #define __TASK_QUEUE_H__
 
 #include <queue>
-#include "net_mutex.h"
-#include "net_cond.h"
+#include <vector>
+#include "runnable.h"
+#include "log.h"
 
 enum TaskPriority {
     NO_1 = 0,
@@ -12,15 +13,50 @@ enum TaskPriority {
 };
 
 struct Task {
-    std::function<void(void*)> Task;
-
+    Runnable* mRunnable;
+    TaskPriority mPriority;
+    Task() = default;
+    Task(Runnable* runnable, const TaskPriority priority)
+        :mRunnable(runnable),
+         mPriority(priority)
+    {
+    }
+    Task(const Task&) = default;
+    Task(Task&&) = default;
 };
 
+struct TaskCmp {
+    bool operator()(const Task& a, const Task& b) const {
+        return a.mPriority < b.mPriority;
+    }
+};
 
 class TaskQueue {
+public:
+    void Push(Runnable* runnable, const TaskPriority priority = NO_3) {
+        mQueue.emplace(runnable, priority);
+    }
 
+    Runnable* Front() {
+        if(mQueue.empty()) {
+            PLOG(ERROR, "Get Task from taskqueue but the queue is empty!");
+            return NULL;
+        }
+        const Task& t = mQueue.top();
+        return t.mRunnable;
+    }
 
-    
+    void Pop() {
+        if(mQueue.empty()) {
+            PLOG(ERROR, "Pop, but the task queue is already empty");
+            return;
+        }
+        mQueue.pop();
+    }
+private:
+    typedef std::priority_queue<Task, std::vector<Task>, TaskCmp> tQueue;
+private:
+    tQueue mQueue;
 };
 
 #endif

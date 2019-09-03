@@ -28,6 +28,8 @@ public:
         if(type < mLogLevel) {
             return;
         }
+        std::cout << "[" <<  __FILE__ << "]";
+        std::cout << "in function[" << __FUNCTION__<< ":line:" << __LINE__ << "]";
         std::cout << "[" << getTimeStap()  << "]";
         std::cout << "[" << getLevel(type) << "]";
         std::cout << "[" << mess << "]"    << std::endl;
