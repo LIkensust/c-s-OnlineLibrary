@@ -33,13 +33,26 @@ struct TaskCmp {
 
 class TaskQueue {
 public:
+    ~TaskQueue() {
+        Destroy();
+    }
+
+    void Destroy() {
+        while(!mQueue.empty()) {
+            const Task& t = mQueue.top();
+            t.mRunnable->Free();
+            mQueue.pop();
+        }
+    }
+
+
     void Push(Runnable* runnable, const TaskPriority priority = NO_3) {
         mQueue.emplace(runnable, priority);
     }
 
     Runnable* Front() {
         if(mQueue.empty()) {
-            PLOG(ERROR, "Get Task from taskqueue but the queue is empty!");
+            PLOG(WARNING, "Get Task from taskqueue but the queue is empty!");
             return NULL;
         }
         const Task& t = mQueue.top();
@@ -52,6 +65,10 @@ public:
             return;
         }
         mQueue.pop();
+    }
+    
+    void Clear() {
+        Destroy();
     }
 private:
     typedef std::priority_queue<Task, std::vector<Task>, TaskCmp> tQueue;

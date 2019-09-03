@@ -22,9 +22,30 @@ public:
         return ret;
     }
 
+    int Join() {
+        assert(mStarted);
+        return pthread_join(mTid, NULL);
+    }
+
+    int Detach() {
+        assert(mStarted);
+        return pthread_detach(mTid);
+    }
+
+    int SetPriority(int priority, int policy = SCHED_OTHER) {
+        struct sched_param schedparam;
+        schedparam.sched_priority = priority;
+        return pthread_setschedparam(mTid, policy, &schedparam);
+    }
+
 private:
     static void* Hook(void* userdata) {
-        Thread* thread = reinterpret_cast<Thread*>
+        Thread* thread = reinterpret_cast<Thread*>(userdata);
+        assert(thread != NULL);
+        if(thread->mThreadFunc) {
+            thread->mThreadFunc();
+        }
+        return NULL;
     }
 
 private:
