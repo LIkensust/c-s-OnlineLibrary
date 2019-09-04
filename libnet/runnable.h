@@ -1,5 +1,5 @@
 #ifndef __RUNNABLE_H__
-#define __RUNNABLE_h__
+#define __RUNNABLE_H__
 
 class Runnable
 {

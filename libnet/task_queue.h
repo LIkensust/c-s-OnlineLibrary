@@ -23,6 +23,7 @@ struct Task {
     }
     Task(const Task&) = default;
     Task(Task&&) = default;
+    Task& operator=(const Task&) = default;
 };
 
 struct TaskCmp {
@@ -52,7 +53,7 @@ public:
 
     Runnable* Front() {
         if(mQueue.empty()) {
-            PLOG(WARNING, "Get Task from taskqueue but the queue is empty!");
+            PLOG(DEBUG, "Get Task from taskqueue but the queue is empty!");
             return NULL;
         }
         const Task& t = mQueue.top();

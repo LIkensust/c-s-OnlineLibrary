@@ -29,7 +29,7 @@ public:
 
 public:
     bool Init(int numThreads) {
-        assert(numpunct > 0);
+        assert(numThreads > 0);
         mState = RUNNING;
         for(int i = 0; i < numThreads; ++i) {
             Thread* thread = new Thread(std::tr1::bind(&ThreadPoll::ThreadProc, this));
