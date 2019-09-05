@@ -1,15 +1,43 @@
 #ifndef __DATA_BUFFER_H__
 #define __DATA_BUFFER_H__
 #include <vector>
+#include <algorithm>
 #include <sys/uio.h>
 #include <errno.h>
 #include <unistd.h>
+#include "log.h"
+
 #define BUFFERSIZE 65535
 class DataBuffer
 {
 public:
-    DataBuffer() {}
+    DataBuffer()
+        :mCur(0)
+    {}
     ~DataBuffer() {}
+
+    const char* GetCur() const {
+        return &mCharVec[0] + mCur;
+    }
+
+    bool SetCur(const char* p) { 
+        if(p == NULL) {
+            PLOG(ERROR, "SetCur point is NULL");
+            return false;
+        }
+        size_t size = p - &mCharVec[0];
+        SetCur(size);
+        return true;
+    }
+
+    bool SetCur(const size_t index) {
+        if(index >= mCharVec.size()) {
+            PLOG(ERROR, "SetCur out of range");
+            return false;
+        }
+        mCur = index;
+        return true;
+    }
 
     const std::vector<char>& GetData() {
         return mCharVec;
@@ -47,12 +75,27 @@ public:
         return size;
     }
 
-    const chat *findCRLF() const {
-        const char CRLF[] = "\r\n";
-        const char *crlf = std::search();
+    int Append(const DataBuffer& buff) {
+        return Append(&buff.mCharVec[0], buff.mCharVec.size());
     }
 
+    const char *findCRLF() const {
+        const char CRLF[] = "\r\n";
+        const char *crlf = std::search(&mCharVec[0], &mCharVec[mCharVec.size()-1] + 1, CRLF, CRLF+2);
+        return crlf;
+    }
 
+    const char* findCRLF(const char *start) const {
+        //assert(start <= &mCharVec[mCharVec.size()-1]);
+        //assert(start >= &mCharVec[0]);
+        if( start > &mCharVec[mCharVec.size()-1] || start < &mCharVec[0]) {
+            PLOG(ERROR, "findCRLF start out of range"); 
+            return NULL;
+        }
+        const char CRLF[] = "\r\n";
+        const char *crlf = std::search(start, &mCharVec[mCharVec.size()-1] + 1, CRLF, CRLF+2);
+        return crlf;
+    }
 private:
 
     int write_to_sock(int fd, int* Errno) {
@@ -103,6 +146,7 @@ private:
 
 private:
     std::vector<char> mCharVec;
+    size_t mCur;
 };
 
 #endif

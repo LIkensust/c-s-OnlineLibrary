@@ -14,6 +14,7 @@
 class NetTimer;
 
 class NetHTTPRequest {
+    friend class NetHTTPRequestTester;
 public:
 	enum NetHTTPRequestParseState {
 		ExpectRequestLine,
@@ -31,87 +32,87 @@ public:
 	};
 
 private:
-	int _fd;
-	DataBuffer _inBuff; // 读缓冲区
-	DataBuffer _outBuff; // 写缓冲区
-	bool _working; // 正在工作不能被超时事件断开连接
-	bool _cgi;
+	int mFd;
+	DataBuffer mInBuff; // 读缓冲区
+	DataBuffer mOutBuff; // 写缓冲区
+	bool mWorking; // 正在工作不能被超时事件断开连接
+	bool mCgi;
 
 	// 定时器
-	NetTimer *_timer;
+	NetTimer *mTimer;
 
 	// 报文解析
-	NetHTTPRequestParseState _state; // 解析状态
-	gHttpMethod _method; 
-	gHttpVersion _version;
-	std::string _path; // url路径
-	std::string _query; // url 参数
-	std::unordered_map<std::string, std::string> _headers;
+	NetHTTPRequestParseState mState; // 解析状态
+	gHttpMethod mMethod; 
+	gHttpVersion mVersion;
+	std::string mPath; // url路径
+	std::string mQuery; // url 参数
+	std::unordered_map<std::string, std::string> mHeaders;
 	// std::string _content; // post正文, 暂时不用
 
 public:
 	NetHTTPRequest(int fd) 
-			: _fd(fd)
-			, _working(false)
-			, _cgi(false)
-			, _timer(nullptr)
-			, _state(ExpectRequestLine)
-			, _method(INVALID)
-			, _version(UnKnown)
+			: mFd(fd)
+			, mWorking(false)
+			, mCgi(false)
+			, mTimer(nullptr)
+			, mState(ExpectRequestLine)
+			, mMethod(INVALID)
+			, mVersion(UnKnown)
 	{
         assert(fd >= 0); 
         PLOG(INFO, "create the request"); 
     }
 
 	~NetHTTPRequest() {
-		::close(_fd);
+		::close(mFd);
 	}
 
 	int getSockFd() {
-		return _fd;
+		return mFd;
 	}
 
 	int readBuff(int *savedErrno) {
-		return _inBuff.readFd(_fd, savedErrno);
+		return mInBuff.ReadFd(mFd, savedErrno);
 	}
 
 	int writeBuff(int *savedErrno) {
-		return _outBuff.writeFd(_fd, savedErrno);
+		return mOutBuff.WriteFd(mFd, savedErrno);
 	}
 
-	void appendOutBuffer(const gBuffer& buf) {
-		_outBuff.appendData(buf);
+	void appendOutBuffer(const DataBuffer& buf) {
+		mOutBuff.Append(buf);
 	}
 
-	int writeAbleBytes() {
-		return _outBuff.readableBytes();
-	}
+	//int writeAbleBytes() {
+	//	return mOutBuff.readableBytes();
+	//}
 
 
 	// 定时器相关
 	void setTimer(NetTimer *timer) {
-		_timer = timer;
+		mTimer = timer;
 	}
 
 	NetTimer* getTimer() {
-		return _timer;
+		return mTimer;
 	}
 
 	void setWorking() {
-		_working = true;
+		mWorking = true;
 	}
 
 	void setNoWorking() {
-		_working = false;
+		mWorking = false;
 	}
 
 	bool isWorking() const {
-		return _working;
+		return mWorking;
 	}
 
 	// cgi
 	bool isCGi() {
-		return _cgi;
+		return mCgi;
 	}
 
 	int getCgiLength() {
@@ -121,7 +122,7 @@ public:
 			ss << getHeader("Content-Length");
 		 	ss >> len;
 		} else {
-			len = _query.size();
+			len = mQuery.size();
 		}
 		return len;
 	}
@@ -131,47 +132,47 @@ public:
 		bool hasMore = true;
 
 		while(hasMore) {
-			if(_state == ExpectRequestLine) {
+			if(mState == ExpectRequestLine) {
 				// 处理请求行
-				const char *crlf = _inBuff.findCRLF();
+				const char *crlf = mInBuff.findCRLF();
 				if(crlf) {
-					ok = __parseRequestLine(_inBuff.readPeek(), crlf);
+					ok = __parseRequestLine(mInBuff.GetCur(), crlf);
 					if(ok) {
-						_inBuff.retrieveUntil(crlf + 2);
-						_state = ExpectHeaders;
+						mInBuff.SetCur(crlf + 2);
+						mState = ExpectHeaders;
 					} else {
 						hasMore = false;
 					}
 				} else {
 					hasMore = false;
 				}
-			} else if (_state == ExpectHeaders) {
+			} else if (mState == ExpectHeaders) {
 				// 处理报头
-				const char *crlf = _inBuff.findCRLF();
+				const char *crlf = mInBuff.findCRLF();
 				if(crlf) {
-					const char *colon = std::find(_inBuff.readPeek(), crlf, ':');
+					const char *colon = std::find(mInBuff.GetCur(), crlf, ':');
 					if(colon != crlf) {
-						__addHeader(_inBuff.readPeek(), colon, crlf);
+						__addHeader(mInBuff.GetCur(), colon, crlf);
 					} else { // 报头处理完毕
 						// XXX 处理post模块
 						if(__getMethod() == POST) {
-							_state = ExpectBody;
-							_cgi = true;
+							mState = ExpectBody;
+							mCgi = true;
 						} else {
-							_state = GotAll;
+							mState = GotAll;
 							hasMore = false;
 						}
 					}
-					_inBuff.retrieveUntil(crlf + 2);
+					mInBuff.SetCur(crlf + 2);
 				} else {
 					hasMore = false;
 				}
-			} else if (_state == ExpectBody) {
+			} else if (mState == ExpectBody) {
 				// 处理报文体
 				int len = atoi(getHeader("Content-Length").c_str());
-				__setQuery(_inBuff.readPeek(), len);
-				_inBuff.retrieve(len);
-				_state = GotAll;
+				__setQuery(mInBuff.GetCur(), len);
+				mInBuff.SetCur(len);
+				mState = GotAll;
 				hasMore = false;
 			}
 		}
@@ -179,37 +180,37 @@ public:
 	}
 
 	bool parseFinish() {
-		return _state == GotAll;
+		return mState == GotAll;
 	}
 
 	void resetParse() {
-		_state = ExpectRequestLine;
-		_method = INVALID;
-		_version = UnKnown;
-		_path = "";
-		_query = "";
-		_cgi = false;
-		_headers.clear();
+		mState = ExpectRequestLine;
+		mMethod = INVALID;
+		mVersion = UnKnown;
+		mPath = "";
+		mQuery = "";
+		mCgi = false;
+		mHeaders.clear();
 	}
 
 	std::string getPath() const {
-		return _path;
+		return mPath;
 	}
 
 	std::string getQuery() const {
-		return _query;
+		return mQuery;
 	}
 
 	std::string getHeader(const std::string& key) const {
 		std::string res;
-		if(_headers.find(key) != _headers.end()) {
-			res = _headers.find(key)->second;
+		if(mHeaders.find(key) != mHeaders.end()) {
+			res = mHeaders.find(key)->second;
 		}
 		return res;
 	}
 
 	std::string getMethod() const {
-		switch(_method) {
+		switch(mMethod) {
 			case GET     : return "GET";
 			case POST    : return "POST";
 			case HEAD    : return "HEAD";
@@ -221,7 +222,7 @@ public:
 
 	bool keepAlive() const {
 		std::string con = getHeader("Connection");
-		return con == "Keep-Alive" || (_version == HTTP1_1 && con != "close");
+		return con == "Keep-Alive" || (mVersion == HTTP1_1 && con != "close");
 	}
 
 private:
@@ -262,19 +263,19 @@ private:
 	bool __setMethod(const char *begin, const char *end) {
 		std::string meth(begin, end);
 		if(meth == "GET") 
-			_method = GET;
+			mMethod = GET;
 		else if (meth == "POST") 
-			_method = POST;
+			mMethod = POST;
 		else if (meth == "HEAD")
-			_method = HEAD;
+			mMethod = HEAD;
 		else if (meth == "PUT")
-			_method = PUT;
+			mMethod = PUT;
 		else if (meth == "DELETE") 
-			_method = DELETE;
+			mMethod = DELETE;
 		else 
-			_method = INVALID;
+			mMethod = INVALID;
 
-		return _method != INVALID;
+		return mMethod != INVALID;
 	}
 
 	// 设置url路径
@@ -284,22 +285,22 @@ private:
 		if(subPath == "/") {
 			subPath = "/index.html";
 		}
-		_path = WEB_ROOT + subPath;
+		mPath = WEB_ROOT + subPath;
 	}
 
 	// 设置url参数
 	void __setQuery(const char *begin, const char *end) {
-		_query.assign(begin, end);
-		_cgi = true;
+		mQuery.assign(begin, end);
+		mCgi = true;
 	}
 
 	// 设置post参数
 	void __setQuery(const char *begin, size_t len) {
-		_query.assign(begin, len);
+		mQuery.assign(begin, len);
 	}
 	// 设置版本
 	void __setVersion(gHttpVersion ver) {
-		_version = ver;
+		mVersion = ver;
 	}
 
 
@@ -314,21 +315,21 @@ private:
 		while(!val.empty() && val[val.size() - 1] == ' ')
 			val.resize(val.size() - 1);
 
-		_headers[key] = val;
+		mHeaders[key] = val;
 	}
 
 	std::string __getContenLength() {
-		return _headers["Content-Length"];
+		return mHeaders["Content-Length"];
 	}
 
 
 	gHttpMethod __getMethod() {
-		return _method;
+		return mMethod;
 	}
 
 	void __printHead() {
 		std::cout << "start print head" << std::endl;
-		for(auto& pair : _headers) {
+		for(auto& pair : mHeaders) {
 			std::cout << pair.first << "---->" << pair.second << std::endl;
 		}
 		std::cout << "end of print head" << std::endl;
