@@ -61,7 +61,7 @@ public:
 			, mVersion(UnKnown)
 	{
         assert(fd >= 0); 
-        PLOG(INFO, "create the request"); 
+        PLOG(DEBUG, "create the request"); 
     }
 
 	~NetHTTPRequest() {
@@ -150,11 +150,14 @@ public:
 				// 处理报头
 				const char *crlf = mInBuff.findCRLF();
 				if(crlf) {
+                    PLOG(DEBUG,crlf);
 					const char *colon = std::find(mInBuff.GetCur(), crlf, ':');
 					if(colon != crlf) {
+                        PLOG(DEBUG, "find a head line");
 						__addHeader(mInBuff.GetCur(), colon, crlf);
 					} else { // 报头处理完毕
 						// XXX 处理post模块
+                        PLOG(DEBUG, "can't find head line");
 						if(__getMethod() == POST) {
 							mState = ExpectBody;
 							mCgi = true;

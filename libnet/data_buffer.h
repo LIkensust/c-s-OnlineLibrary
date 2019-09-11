@@ -81,7 +81,7 @@ public:
 
     const char *findCRLF() const {
         const char CRLF[] = "\r\n";
-        const char *crlf = std::search(&mCharVec[0], &mCharVec[mCharVec.size()-1] + 1, CRLF, CRLF+2);
+        const char *crlf = std::search(GetCur(), &mCharVec[mCharVec.size()-1] + 1, CRLF, CRLF+2);
         return crlf;
     }
 

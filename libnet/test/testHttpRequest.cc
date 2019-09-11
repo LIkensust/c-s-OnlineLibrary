@@ -18,7 +18,7 @@ public:
         PLOG(INFO,nhr.getHeader("Accept").c_str());
         PLOG(INFO,nhr.getMethod().c_str());
         for(auto it = nhr.mHeaders.begin(); it != nhr.mHeaders.end(); ++it) {
-            cout<<it->first<<endl;
+            PLOG(INFO,(it->first + ": " + it->second).c_str());
         }
     }
 private:
