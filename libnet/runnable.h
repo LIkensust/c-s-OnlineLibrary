@@ -4,7 +4,12 @@
 class Runnable {
 public:
   Runnable() {}
-  virtual ~Runnable() {}
+  virtual ~Runnable() {
+    Destroy();
+  }
+  virtual void Destroy() {
+      delete this;
+  }
 
 public:
   virtual void Run() = 0;

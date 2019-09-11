@@ -94,6 +94,15 @@ public:
 
   void Retrieve() { mCharVec.clear(); }
 
+  int dataSize() {
+      return mCharVec.size();
+  }
+
+  void clear() {
+      mCharVec.clear();
+      mCur = 0;
+  }
+
 private:
   int write_to_sock(int fd, int *Errno) {
     size_t tmp;

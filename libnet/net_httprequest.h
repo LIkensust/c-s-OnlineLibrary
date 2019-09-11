@@ -72,7 +72,15 @@ public:
 
   int readBuff(int *savedErrno) { return mInBuff.ReadFd(mFd, savedErrno); }
 
-  int writeBuff(int *savedErrno) { return mOutBuff.WriteFd(mFd, savedErrno); }
+  int writeBuff(int *savedErrno) { 
+      int n =  mOutBuff.WriteFd(mFd, savedErrno); 
+      mOutBuff.clear();
+      return n;
+  }
+
+  int writeAbleBytes() {
+      return mOutBuff.dataSize();
+  }
 
   void appendOutBuffer(const DataBuffer &buf) { mOutBuff.Append(buf); }
 
