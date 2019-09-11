@@ -7,16 +7,16 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <cinttypes>
-
+#include <stdio.h>
 #define logLevel INFO
 
-#define PLOG(type, mess) do{ if(type < logLevel)                    \
+#define PLOG(type, format, args...) do{ if(type < logLevel)                    \
     break;                                                          \
     std::cout << "[" <<  __FILE__ << "]";                           \
     std::cout << "[" << __FUNCTION__<< ":line:" << __LINE__ << "]"; \
     std::cout << "[" << getTimeStap()  << "]";                      \
     std::cout << "[" << getLevel(type) << "]";                      \
-    std::cout << "[" << mess << "]"    << std::endl;                \
+    std::printf("[" format "]\n", ##args);                          \
 }while(0)
 
 enum LOGTYPE {

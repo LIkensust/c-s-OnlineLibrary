@@ -3,10 +3,7 @@
 
 int main()
 {
-    Log l;
-    l.SetLevel(DEBUG);
-    //Log::DoLog(INFO, "hello world");
-    PLOG(INFO, "hello world");
+    PLOG(INFO, "hello world %s", "test");
     return 0;
 }
 

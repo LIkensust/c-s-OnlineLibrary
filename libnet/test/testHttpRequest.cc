@@ -13,12 +13,12 @@ public:
         //cout<<nhr.getQuery()<<endl;
         //cout<<nhr.getHeader("Referer")<<endl;
         //cout<<nhr.getMethod()<<endl;
-        PLOG(INFO,nhr.getPath().c_str());
-        PLOG(INFO,nhr.getQuery().c_str());
-        PLOG(INFO,nhr.getHeader("Accept").c_str());
-        PLOG(INFO,nhr.getMethod().c_str());
+        PLOG(INFO,"path  %s", nhr.getPath().c_str());
+        PLOG(INFO,"query %s", nhr.getQuery().c_str());
+        PLOG(INFO,"header %s", nhr.getHeader("Accept").c_str());
+        PLOG(INFO,"method %s", nhr.getMethod().c_str());
         for(auto it = nhr.mHeaders.begin(); it != nhr.mHeaders.end(); ++it) {
-            PLOG(INFO,(it->first + ": " + it->second).c_str());
+            PLOG(INFO,"%s: %s", it->first.c_str(), it->second.c_str());
         }
     }
 private:
