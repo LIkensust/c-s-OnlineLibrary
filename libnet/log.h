@@ -10,47 +10,47 @@
 #include <stdio.h>
 #define logLevel INFO
 
-#define PLOG(type, format, args...) do{ if(type < logLevel)                    \
-    break;                                                          \
-    std::cout << "[" <<  __FILE__ << "]";                           \
-    std::cout << "[" << __FUNCTION__<< ":line:" << __LINE__ << "]"; \
-    std::cout << "[" << getTimeStap()  << "]";                      \
-    std::cout << "[" << getLevel(type) << "]";                      \
-    std::printf("[" format "]\n", ##args);                          \
-}while(0)
+#define PLOG(type, format, args...)                                            \
+  do {                                                                         \
+    if (type < logLevel)                                                       \
+      break;                                                                   \
+    std::cout << "[" << __FILE__ << "]";                                       \
+    std::cout << "[" << __FUNCTION__ << ":line:" << __LINE__ << "]";           \
+    std::cout << "[" << getTimeStap() << "]";                                  \
+    std::cout << "[" << getLevel(type) << "]";                                 \
+    std::printf("[" format "]\n", ##args);                                     \
+  } while (0)
 
 enum LOGTYPE {
-    DEBUG   = 1,
-    INFO    = 2,
-    WARNING = 3,
-    ERROR   = 4
+  DEBUG = 1,
+  INFO = 2,
+  WARNING = 3,
+  ERROR = 4
 };
 
-std::string getLevel(const LOGTYPE& type) {
-    switch(type) {
-    case DEBUG:
-        return "DEBUG";
-    case INFO:
-        return "INFO";
-    case WARNING:
-        return "WARNING";
-    case ERROR :
-        return "ERROR";
-    default:
-        return "";
-    }
+std::string getLevel(const LOGTYPE &type) {
+  switch (type) {
+  case DEBUG:
+    return "DEBUG";
+  case INFO:
+    return "INFO";
+  case WARNING:
+    return "WARNING";
+  case ERROR:
+    return "ERROR";
+  default:
+    return "";
+  }
 }
 
 uint64_t getTimeStap() {
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    return time.tv_sec;
+  struct timeval time;
+  gettimeofday(&time, NULL);
+  return time.tv_sec;
 }
 
-
-
 /*
-   class Log 
+   class Log
    {
    public:
    Log()
@@ -65,7 +65,7 @@ uint64_t getTimeStap() {
    std::cout << "[" << getTimeStap()  << "]";
    std::cout << "[" << getLevel(type) << "]";
    std::cout << "[" << mess << "]"    << std::endl;
-   } 
+   }
 
    bool SetLevel(const LOGTYPE& type) {
    if(mTypeSetted == true) {
