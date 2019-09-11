@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include <cinttypes>
 #include <stdio.h>
-#define logLevel INFO
+#define logLevel DEBUG
 
 #define PLOG(type, format, args...)                                            \
   do {                                                                         \

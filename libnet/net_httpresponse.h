@@ -73,6 +73,7 @@ public:
 
     if (S_ISDIR(st.st_mode)) {
       mPath += "/index.html";
+      PLOG(DEBUG, "file path %s", mPath.c_str());
     } else if ((S_IXUSR & st.st_mode) || (S_IXGRP & st.st_mode) ||
                (S_IXOTH & st.st_mode)) {
       mCgi = true;
