@@ -9,7 +9,7 @@
 #include "log.h"
 #include "data_buffer.h"
 
-#define WEB_ROOT "../wwwroot"
+#define WEB_ROOT "/home/ubuntu/wwwroot"
 
 class NetTimer;
 

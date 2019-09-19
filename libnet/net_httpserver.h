@@ -127,7 +127,8 @@ private:
 
 	// 处理请求报文
 	void __doRequest(NetHTTPRequest *req) {
-		_timerManager->delTimer(req); // 正在处理的不设置超时
+        PLOG(DEBUG, "处理请求报文");
+        _timerManager->delTimer(req); // 正在处理的不设置超时
 		assert(req != nullptr);
 		int work_fd = req->getSockFd();
 

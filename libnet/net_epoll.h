@@ -89,11 +89,13 @@ public:
 					req->setNoWorking();
 					mOnCloseConnection(req);
 				} else if (mEvents[i].events & EPOLLIN) {
+                    PLOG(DEBUG, "epoll 创建一个读事件");
 					req->setWorking();
 					thread_pool->Execute(new EpollTask(mOnRequest, req));
 				} else if (mEvents[i].events & EPOLLOUT) {
+                    PLOG(DEBUG, "epoll 创建一个写事件");
 					req->setWorking();
-					thread_pool->Execute(new EpollTask(mOnRequest, req));
+					thread_pool->Execute(new EpollTask(mOnResponse, req));
 				} else {
 					std::cout << __FILE__ << " : " << __LINE__ << "epoll event err" << std::endl;
 				}
@@ -115,7 +117,7 @@ public:
 	}
 
 	void setOnResponse(const NetCallBackFunction& cb) {
-		mOnRequest = cb;
+		mOnResponse = cb;
 	}
 
 	~NetEpoll() {
@@ -137,9 +139,10 @@ private:
             Destroy();
         }
         virtual void Destroy() {
-            delete this;
+            //delete this;
         }
         virtual void Run() {
+            PLOG(DEBUG, "epoll task run");
             mF(mReq);
         }
     private:
