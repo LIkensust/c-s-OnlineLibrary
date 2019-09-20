@@ -120,7 +120,6 @@ public:
       ::putenv(const_cast<char *>(chLenEnv.c_str()));
 
       ::execl(mPath.c_str(), mPath.c_str(), NULL);
-      ::exit(1);
     } else {
       ::close(in_pipe[0]);
       ::close(out_pipe[1]);

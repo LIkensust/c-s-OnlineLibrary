@@ -4,7 +4,7 @@
 
 int main()
 {
-    NetHTTPServer server(9876,5);
+    NetHTTPServer server(9876,20);
     server.run();
     return 0;
 }

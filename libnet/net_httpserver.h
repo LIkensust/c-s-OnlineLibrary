@@ -77,6 +77,7 @@ public:
 		_epoll->setOnResponse(std::bind(&NetHTTPServer::__doResponse, this, std::placeholders::_1));
 
 		// 事件循环
+        int loop = 0;
 		for( ; ; ) {
 			int timeMs = _timerManager->getNextExpireTime();
 
@@ -89,6 +90,7 @@ public:
 				_epoll->handleEvents(_listenFd, _threadPool, eventsNum);
 			}
 			_timerManager->handleExpireTimers();
+            PLOG(DEBUG, "loop count %d", loop++);
 		}
 	}
 

@@ -137,14 +137,14 @@ public:
         // 处理报头
         const char *crlf = mInBuff.findCRLF();
         if (crlf) {
-          PLOG(DEBUG, "%s", crlf);
+          //PLOG(DEBUG, "%s", crlf);
           const char *colon = std::find(mInBuff.GetCur(), crlf, ':');
           if (colon != crlf) {
-            PLOG(DEBUG, "find a head line");
+            //PLOG(DEBUG, "find a head line");
             __addHeader(mInBuff.GetCur(), colon, crlf);
           } else { // 报头处理完毕
                    // XXX 处理post模块
-            PLOG(DEBUG, "can't find head line");
+            //PLOG(DEBUG, "can't find head line");
             if (__getMethod() == POST) {
               mState = ExpectBody;
               mCgi = true;

@@ -27,7 +27,7 @@ public:
   }
 
   bool SetCur(const size_t index) {
-    if (index >= mCharVec.size()) {
+    if (index > mCharVec.size()) {
       PLOG(ERROR, "SetCur out of range");
       return false;
     }
